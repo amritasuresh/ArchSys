@@ -1,0 +1,87 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\usepackage{hyperref}
+\selectlanguage{french}
+\usepackage[toc,page]{appendix}
+\usepackage{amsmath}
+
+%\usepackage[dvipsnames]{xcolor}
+
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+%\ifx \public \undefined \def\public{enseignants} \fi
+\usepackage[\public]{../tps}
+\usepackage{tikz}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\urlstyle{same}
+
+
+
+% Numéro du TP
+\newcommand{\numtd}{03}
+% Titre du TP
+\newcommand{\titretd}{Threads and semaphores}
+\def\tup#1{\langle #1\rangle}
+\begin{document}
+	
+	\entete{\numtd}{\titretd}
+
+\section{Review}
+\begin{enumerate}
+	\item What is the main difference between threads and processes? Can we use them interchangeably?
+	\item Download the program \texttt{mailbox.c} from the website. You have seen this example in class. What happens when the value of MAX is 10? 100? 1000? 1000000? Why does it not work as planned? Can you fix it?
+	
+	\emph{Note: Observe that inside the} \texttt{for} \emph{loop, we have only one line of code, i.e.} \texttt{mails++;} \emph{Why still do we have a race condition?}
+	\item Now, write a program in C with two threads. The first thread displays even integers up to 100, the second the odd. Use semaphores to ensure the correct order of integers.
+	
+\end{enumerate} 
+
+\section{Producer-Consumer}
+
+A typical problem in concurrent programming is that of producer and consumer: one thread produces data that the other consumes. We consider the \texttt{procon.c} program. Here the producer gets characters from a file and sends them to a shared space with the thread 'consumer' who displays them on the screen. However, in the current version, no synchronization exists in between. Modify the program so that it displays the contents of a file correctly.
+
+\section{Binary Semaphores vs. Mutexes}
+
+Download the program \texttt{mutexvsem.c}. Run it. Do you see any errors? Now, change the mutexes and have it use semaphores instead. Does it work? 
+
+Can you justify your observation?
+
+$$\star \star\star$$
+
+\section{Counting semaphores}
+
+Implement a logging queue using semaphores. You can use the template given in \texttt{login.c}. Your objective is to ensure that the resource (in our case the section enclosed in 'finite resource') is used by at most 12 users at a time. Create 15 threads and use a semaphore to manage the resource.
+
+\section{The function of Hénon}
+
+We will calculate the orbit of a dynamic system of dimension 2. The function of Hénon is described by the system 
+\begin{equation*}
+	\label{eq:1}
+	H_{a,b} = \left\{
+	\begin{aligned}
+		x_{n+1} &= a - by_{n} - x_{n}^{2} \\
+		y_{n+1} &= x_{n}.
+	\end{aligned}
+	\right.
+\end{equation*}
+We already have the function from last week. We will modify the program to use threads instead. We will use one thread to calculate the sequence\( (x_{n})_{n} \) and another thread for the sequence\( (y_{n})_{n} \). Propose a means of synchronization to ensure interleaving of the computations of $x_n$ and $y_n$. Implement it. 
+
+We can plot the function with the command \texttt{gnuplot henon.p} after having downloaded the script "henon.p". The file \texttt{henon.dat} must be in the same folder as \texttt{henon.p}. (You will need \texttt{gnuplot} for this).
+
+Observe the graph you get for values \( a = 1.4 \) et \( b = -0.3 \).
+
+
+
+\end{document}

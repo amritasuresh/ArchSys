@@ -1,0 +1,95 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{09}
+% Titre du TP
+\newcommand{\titretd}{Programmation}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+\section{Calculatrice}
+
+Dans cet exercice on étudie l'utilisation et l'évaluation du code de sortie d'un processus.
+Normalement, le code de sortie est utilisé pour indiquer par exemple la réussite ou non d'un programme.
+Ici, nous nous en servirons pour communiquer les résultats d'un calcul.
+Remarque : le code de sortie est compris entre 0 et 255, ce n'est pas idéal, mais il s'agit juste d'un exemple.
+Références : fork(2), wait(2) et \texttt{make}
+
+\begin{enumerate}
+ \item Commençons par un exemple simple (\texttt{simple.c}) qui calcule la somme de deux entiers.
+ Complétez le programme tel que le fils utilise \texttt{exit} pour communiquer la somme au père et que le père reçoive cette valeur par \texttt{wait} / \texttt{WEXITSTATUS}.
+
+ \item Application plus complexe : la page web du cours contient un calculateur simple qui évalue des expressions avec des entiers naturels, addition, multiplication et soustraction.
+
+Dans l'état actuel le programme convertit l'expression vers un arbre, puis il traverse les nœuds de l'arbre un par un pour calculer les valeurs de toutes les sous-expressions.
+Votre tâche est de permettre au programme de calculer les sous-expressions \emph{en parallèle}.
+
+Lorsque le programme évalue une sous-expression, il devra lancer deux processus fils qui évalueront leurs sous-expressions et qui en communiqueront le résultat au père par leurs codes de sortie.
+Le père attend les deux résultats et applique l'opération (+,*,-) pour obtenir son propre résultat.
+Il suffit de modifier la fonction \texttt{compute} dans \texttt{main}.
+
+Remarque : Il est légèrement plus facile de réaliser la multiplication et l'addition que la subtraction -- pourquoi ?
+
+\end{enumerate}
+
+\section{Exclusion mutuelle}
+
+Dans cet exercice nous illustrerons les problèmes d'accès concurent à une variable et nous nous initierons a la programmation des threads.
+
+Cette fois, pas de code source de départ, le sujet vous aidera un peu mais vous écrirez votre code "from scratch" (ceci est une indication subliminale).
+
+\begin{enumerate}
+ \item Créez un code source composé :
+ \begin{itemize}
+  \item d'une constante $x$ supérieure à 10~000 ;
+\begin{solution}
+ Suggérer d'utiliser define
+\end{solution}
+  \item d'une fonction \texttt{process0} incrémentant $x$ fois une variable globale \texttt{cpt} ;
+  \item d'un corps de programme instanciant deux threads, attendant le résultat de ces executions et l'affichant sur la sortie standard.
+ \end{itemize}
+ Avant de commencer à écrire votre code, quel est le résultat attendu ? Est-ce le résultat obtenu ? Pourquoi ?
+
+ \item Algorithme de Peterson.
+
+ Nous proposons de solutionner le problème précédent en implémentant l'algorithme d'exclusion mutuelle de Peterson décrit sur Wikipedia.
+ Le principe consiste à utiliser 3 variables \texttt{f0}, \texttt{f1} et \texttt{turn} pour gérer l'entrée dans la <<section critique>> du code.
+ La <<section critique>> est la section contenant le code à protéger des accès concurents.
+
+ Prouvez que algorithme assure l'exclusion mutuelle.
+
+ \item En vous basant sur la page Wikipedia de cet algorithme :
+ \begin{itemize}
+  \item modifiez la fonction \texttt{process0} et créez la fonction \texttt{process1} implémentant l'algorithme de Gary L. Peterson ;
+
+\textbf{Note:}  \texttt{process0}  et  \texttt{process1} impléméntent la même fonctionnalité mais pour les threads 0 et 1.
+  \item Testez votre code et commentez.
+  \begin{solution}
+    https://www-ssl.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-system-programming-manual-325384.pdf Section 8-6 Vol. 3A 8.2.2 Memory Ordering in P6 and More Recent Processor Families
+  \end{solution}
+ \end{itemize}
+
+ \item En vous basant sur le code de \texttt{process0} et \texttt{process1} écrire la fonction \texttt{process} qui permettra l'invocation générique d'un thread.
+
+ \item Toujours en vous basant sur la page Wikipedia de l'algorithme de Peterson, modifiez votre code pour 4 processus.
+
+ \item Mêmes questions que précédemment pour l'algorithme de Dekker.
+
+\end{enumerate}
+
+
+
+\end{document}

@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\usepackage{hyperref}
+\selectlanguage{french}
+\usepackage[toc,page]{appendix}
+\usepackage{amsmath}
+
+%\usepackage[dvipsnames]{xcolor}
+
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+%\ifx \public \undefined \def\public{enseignants} \fi
+\usepackage[\public]{../tps}
+\usepackage{tikz}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\urlstyle{same}
+
+
+
+% Numéro du TP
+\newcommand{\numtd}{03}
+% Titre du TP
+\newcommand{\titretd}{Input/Output Redirection and Pipes}
+\def\tup#1{\langle #1\rangle}
+\begin{document}
+	
+	\entete{\numtd}{\titretd}
+
+\section{Review}
+In order to run shell commands on C, we use the \verb*|execlp| command. Download "execlp" to see how this function works.
+
+\begin{itemize}
+	\item Add the following line after the  \verb*|execlp| command.
+	\begin{verbatim}
+		printf("Execlp successfully executed!\n");
+	\end{verbatim}
+	What do you observe? Why does it happen? Check the manual to see if you can figure out.
+	\item Use \verb*|fork| in order to correct this code. Hint: you will also need to use \verb*|wait|.
+	\item Now, finally, write into the file \verb*|"pingReader.txt"|  the input from the \verb*|execlp|. Hint: Use the \verb*|dup2| command you saw in class.
+\end{itemize}
+
+\section{Shady files}
+
+Download the file \texttt{https://amritasuresh.github.io/teaching/TP8/obsf} from the shell into an empty directory and run it. Two (empty) files should have appeared in your current directory. Delete them using only the command line.
+
+Note: how are files identified in general?
+
+\section{Wrong program}
+Consider \verb*|closed_pipe.c|. The son is supposed to print the characters sent to him by the parent. Explain the error you see, and correct the program.
+
+\section{Pipes and code replacement}
+\begin{enumerate}
+	\item Last week, we used exit signals to communicate between parent and child processes. Modify the code for \texttt{simple.c} from last week to use pipes instead.
+	
+	\item Write a program (in C) that downloads the archive \verb*|bootstrap.tar.gz| (which can be found in \texttt{https://amritasuresh.github.io/teaching/bootstrap.tar.gz}), and unzips it without creating a temporary file. In other words, we want the command \texttt{curl <url> | tar xz} in C. The curl and tar programs will be called by $\verb*|execlp|$.
+\end{enumerate}
+
+\section{Buffered and Unbuffered output}
+Download the file \verb*|buffered.c|. What do you expect the output to be when you have a look? What is the actual output. Can you explain the discrepancy?
+
+\section{The function of Hénon}
+
+We will calculate the orbit of a dynamic system of dimension 2. The function of Hénon is described by the system 
+\begin{equation*}
+	\label{eq:1}
+	H_{a,b} = \left\{
+	\begin{aligned}
+		x_{n+1} &= a - by_{n} - x_{n}^{2} \\
+		y_{n+1} &= x_{n}.
+	\end{aligned}
+	\right.
+\end{equation*}
+We will use one process to calculate the sequence \( (x_{n})_{n} \)  and another process to calculate the sequence  \( (y_{n})_{n} \).The processes will exchange their data via one (or more) pipe (s). 
+
+\begin{enumerate}
+	\item First, in order to avoid having to set up a synchronization between the processes, we can use pauses \verb|sleep(1)|.
+	\item How to set up synchronization by signals?
+	\medskip
+	
+Subsequently, we will also create a process dedicated to the exit: this process must write lines in the form \texttt{0.3415 1.2451} where the first number
+is $x_{n}$ and the second $y_{n}$ in a file \texttt{henon.dat}.
+
+We can plot the function with the command \texttt{gnuplot henon.p} after having downloaded the script "hennon.p". The file \texttt{henon.dat} must be in the same folder as \texttt{henon.p}. 
+
+Observe the graph you get for values \( a = 1.4 \) et \( b = -0.3 \).
+\end{enumerate}
+
+
+\end{document}

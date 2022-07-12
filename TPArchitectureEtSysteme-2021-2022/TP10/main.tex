@@ -1,0 +1,88 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\usepackage{hyperref}
+\selectlanguage{french}
+\usepackage[toc,page]{appendix}
+\usepackage{amsmath}
+
+%\usepackage[dvipsnames]{xcolor}
+
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+%\ifx \public \undefined \def\public{enseignants} \fi
+\usepackage[\public]{../tps}
+\usepackage{tikz}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\urlstyle{same}
+
+
+
+% Numéro du TP
+\newcommand{\numtd}{03}
+% Titre du TP
+\newcommand{\titretd}{Leader election}
+\def\tup#1{\langle #1\rangle}
+\begin{document}
+	
+	\entete{\numtd}{\titretd}
+
+\section{Ring election - an introduction}
+An important problem in concurrent programming is choosing a leader, e.g. for organizing and coordinating a network. We start with a number $n$ of computers or processes (we will call them \emph{nodes}) identical in principle and function, with the exception of a unique identifier. By following the same protocol, all the nodes will agree on the choice of a leader.
+
+There is a wide variety of protocols leading to this result. We are going in this TP to study and
+implement one: the Dolev, Klawe, and Rodeh protocol which is distinguished by the low number of messages
+traded for election: $\mathcal{O}(n\log n)$. By comparison, simple approaches tend to use $\mathcal{O}(n^2)$ messages. The explanatory slides are available in the directory.
+
+The protocol assumes that the nodes are organized in a ring, each node sends messages
+to his neighbor on the right. The TP directory contains a skeleton that will create $n$ processes (the nodes) for
+$n$ given; these processes will already be equipped with pipes to communicate. Your task is to complete the
+program by simply implementing the protocol function, following these steps:
+\begin{itemize}
+	\item  Initially, all nodes are active and have a unique identifier.
+	\item An active node waits for a small random period (the \texttt{delay()} function does this), then sends its identifier to its neighbor on the right. Then, it waits for the credentials of its two closest active neighbors at its left. It will then decide whether to stay active, become passive, or declare itself a leader. The conditions are specified in the presentation. If it remains active, it repeats the behavior shown above.
+	\item A passive (inactive) node simply forwards all messages received from the left to its neighbor on the right. In addition, if the message declares a leader, it displays a corresponding message on the screen.
+	\item There are three types of messages exchanged by the nodes, all in the format (type, identifier).
+	- “neighbor” (\texttt{v}): to send his identifier to the neighbor on the right.
+	- “next” (\texttt{p}): a node which has received the identifier of its left neighbor sends it to its neighbor
+	of right.
+	- “winner” (\texttt{g}): a node declares itself a leader.
+\end{itemize}
+
+
+\section{Implementation on your own computer}
+
+A skeletal code (along with the slides) is available at \url{amritasuresh.github.io/teaching/leader.tar.gz}.
+\begin{enumerate}
+	\item Complete the \texttt{protocol} function of the \texttt{ring-pipe.c} file which implements the above-described protocol.
+	\item Test your code with multiple values of $n$. See if your program always terminates, and if there is always exactly one leader.
+\end{enumerate}
+
+
+\section{Netowrk implementaton}
+The network version of the program, \texttt{ring-net.c} instantiates a single node per run. You can
+copy the \texttt{protocol} function of your own \texttt{ring-pipe.c}  The program takes 3 arguments: the port
+listening node, the name of the neighbor node (machine name), the connection port to the neighbor node. 
+
+The program creates a server in a thread and waits for a neighbor to connect. In parallel, in a
+another thread, it tries a connection on its neighbor (machine name and port passed as argument).
+\begin{itemize}
+	\item Write a script that implements the execution of your code on 5 machines in the department. Start by testing the execution of your code locally (localhost machine using different
+	ports). Gradually expand the size of the ring.
+	\item Create a ring with your neighbors and extend it to the whole lab room.
+\end{itemize}
+
+
+
+\end{document}

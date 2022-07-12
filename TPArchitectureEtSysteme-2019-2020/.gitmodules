@@ -1,0 +1,3 @@
+[submodule "mwc/wc-multicore"]
+	path = mwc/wc-multicore
+	url = git@git.lsv.fr:hondet/wc-multicore.git

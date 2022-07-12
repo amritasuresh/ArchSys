@@ -1,0 +1,130 @@
+\NeedsTeXFormat{LaTeX2e}[1999/01/01]
+\ProvidesPackage{tps}[2010/02/04]
+
+\newif\if@enseignants \@enseignantsfalse
+\newif\ifprojet \projetfalse
+\DeclareOption{enseignants}{\@enseignantstrue}
+\DeclareOption{projet}{\projetfalse}
+\DeclareOption*{}
+\ProcessOptions
+
+% Année universitaire :
+\newcommand{\displayYear}{2016-2017}
+
+\RequirePackage[francais]{babel}
+\RequirePackage[utf8]{inputenc}
+%\RequirePackage{lmodern}
+
+% Quelques options...
+\RequirePackage{fullpage}
+\RequirePackage{graphicx} 
+\RequirePackage{url}
+\RequirePackage{float}
+
+\RequirePackage[x11names]{xcolor}
+\RequirePackage{framed}
+\RequirePackage{listingsutf8}
+
+\RequirePackage{ifthen}
+\RequirePackage{xcomment}
+
+
+% Pour utiliser une police sans serif dans la page
+\renewcommand{\rmdefault}{phv}
+
+% Les dimensions de page
+\oddsidemargin=-0,8cm
+\headsep=-1,5cm
+\textwidth 18cm
+\textheight 25,3cm
+
+%%%%%%%%%%%%%%%%%%%%% ENTETE %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\entete}[2]{%
+	\noindent \rule{18cm}{0.05cm}\\[0.25cm] 
+	\noindent 
+	{\large \textbf{Architecture et Système}} \hfill {\large
+	\ifprojet
+		Projet
+	\fi
+	\displayYear}\\[0.1cm]
+	{Département Informatique, ENS de Cachan}\\ 
+	\noindent \rule{18cm}{0.05cm}\\
+	\begin{center}
+		\ifprojet
+			{\LARGE\textbf{#1}}
+		\else
+			{\LARGE\textbf{TP #1 : #2}}
+		\fi
+		\if@enseignants
+			\\[0.25cm] \textcolor{Firebrick3}{\textbf{Version Enseignants}}
+		\fi
+	\end{center}
+	\rule{18cm}{0.05cm}\\
+}
+
+%%%%%%%%%%%%%%%%%%%%% INTRODUCTION %%%%%%%%%%%%%%%%%%%%
+
+\newenvironment{introduction}{%
+	\par\noindent\textbf{Introduction}: \noindent
+}{
+	\par\noindent
+}
+
+%%%%%%%%%%%%%%%%%%%%% L'environnement specifique Enseignants %%%%%%%%%%%%%
+
+\if@enseignants
+
+\newenvironment{solution}{%
+	\pagebreak[2]%
+	\definecolor{shadecolor}{named}{Snow3}%
+	\begin{shaded}%
+		\noindent%
+		\textsf{\textbf{Solution:}}%
+		\nopagebreak[4]%
+}{
+	\end{shaded}%
+	\par%
+	\addvspace{\medskipamount}%
+}
+\else
+	\newxcomment[]{solution}
+\fi
+
+% %%%%%%%%%%%%%%%%%%%% Listings  %%%%%%%%%%%%m%%%%%%%%%%%%
+
+% Par défaut le langage est BASH
+\lstset{
+ tabsize=2,
+ showstringspaces=true,
+ showlines=false,
+ frame=trbl,
+ basicstyle=\sffamily,
+ breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+ breaklines=true,                 % sets automatic line breaking
+ captionpos=b,                    % sets the caption-position to bottom
+ extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+ frame=single,	                  % adds a frame around the code
+ keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+ otherkeywords={*,...},           % if you want to add more keywords to the set
+ numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+ numbersep=5pt,                   % how far the line-numbers are from the code
+ numberstyle=\tiny\color{gray},   % the style that is used for the line-numbers
+ rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+ showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+ showstringspaces=false,          % underline spaces within strings only
+ showtabs=false,                  % show tabs within strings adding particular underscores
+ stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+ tabsize=2,	                      % sets default tabsize to 2 spaces
+ title=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+ inputencoding=utf8/latin1,
+ escapeinside={\%*}{*)}
+}
+
+% Langage SH
+\newcommand{\setshlangage}{\lstset{language=sh, tabsize=2, showstringspaces=true, showlines=false, frame=trbl, basicstyle=\sffamily}}
+% Langage PERL
+\newcommand{\setperllangage}{\lstset{language=perl, tabsize=2, showstringspaces=true, showlines=false, frame=trbl, basicstyle=\sffamily}}
+% Langage MAKE
+\newcommand{\setmakelangage}{\lstset{language=make, tabsize=2, showstringspaces=true, showlines=false, frame=trbl, basicstyle=\sffamily}}
+

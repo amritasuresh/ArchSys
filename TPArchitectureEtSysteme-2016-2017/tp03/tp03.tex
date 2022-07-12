@@ -1,0 +1,104 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{03}
+% Titre du TP
+\newcommand{\titretd}{Circuits logiques}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+\begin{introduction}
+ Page web du cours :
+ \begin{center}
+  \url{http://www.lsv.ens-cachan.fr/~schwoon/enseignement/systemes/ws1617/}
+ \end{center}
+
+ Utilisez la page suivante pour construire vos circuits :
+ \begin{center}
+  \url{http://www.neuroproductions.be/logic-lab/}
+ \end{center}
+\end{introduction}
+
+\section{Codeur}
+
+Un \emph{codeur} est l'opposé du \emph{décodeur} discuté en cours ;
+il prend $2^k$ signaux en entrée ($x_0\cdots x_{2^k-1}$) et fournit un
+vecteur de $k$ sorties $y_{k-1}\cdots y_0$ représentant une valeur $y$.
+Si $k$ est fixe, on parle d'un $k$-codeur.
+Dans un codeur, on suppose qu'exactement une des sorties a la valeur 1,
+disons $x_i$. Dans ce cas, la valeur binaire des sorties est censé être $i$.
+Le comportement pour d'autres cas n'est pas spécifié.
+
+\begin{enumerate}
+ \item Construisez un 1-codeur. (trivial)
+ \item Construisez un 2-codeur.
+ \item Comment géneraliser la construction pour un $k$ quelconque ?
+	Quelle est la taille et la profondeur de votre construction
+	par rapport à $k$ ?
+ \item Construisez un 2-codeur avec l'application web mentionnée ci-dessus.
+\end{enumerate}
+
+\begin{solution}
+ \begin{enumerate}
+  \item
+ \begin{tabular}{|l|c|r|}
+  \hline
+  $x_1$ & $x_0$ & $y_0$ \\
+  \hline
+  0 & 1 & 0 \\
+  1 & 0 & 1 \\
+  \hline
+ \end{tabular}
+ \end{enumerate}
+\end{solution}
+
+\section{Codeur de priorité}
+
+Un \emph{codeur de priorité} (CP) est comme un codeur, mais il gère le
+cas où plusieurs entrées ont la valeur 1. Dans ce cas, $y$ prend
+la valeur du plus grand indice $i$ tel que $x_i=1$. Une autre sortie $z$
+indique si au moins un des $x_i$ était $1$. Si $z=0$, la valeur de $y$
+n'est pas spécifiée.
+
+\begin{enumerate}
+ \item Selon vous, à quoi peut servir un tel circuit ?
+ \item Construisez un CP pour 2, puis 4 signaux avec l'application web.
+ \item Étant donné deux $k$-CP, décrivez comment
+   construire efficacement un $(k+1)$-CP.
+ \item Décrivez comment construire un $2k$-CP à partir des $k$-CP
+   (et d'autres circuits discutés en dans le cours).
+\end{enumerate}
+
+\iffalse
+\section{Verrou RS}
+\begin{enumerate}
+ \item Construisez un verrou RS, mais avec des NON-ET au lieu des NON-OU.
+  Quel sera le comportement des sorties $Q,\bar Q$ en fonction des entrées
+  $R,S,Q, \bar Q$ ?
+ \item Comparez le comportement d'un verrou construit avec des portes au
+  verrou directement disponible dans l'appli.
+\end{enumerate}
+
+\section{Verrou T et compteur}
+\begin{enumerate}
+ \item Expérimentez avec le verrou T disponsible dans l'appli. Qu'est-ce qu'il
+  fait ? (Essayez-le avec un interrupteur et un impulseur en entrée.)
+ \item Chargez l'exemple qui simule un compteur binaire (en bas de la page).
+  Modifiez-le pour qu'il augmente le compteur au lieu de le décroître.
+\end{enumerate}
+\fi
+
+\end{document}

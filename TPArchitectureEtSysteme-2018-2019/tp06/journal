@@ -1,0 +1,23 @@
+cd /tmp
+qemu-img create -f qcow2 /tmp/hda.qcow2 5G
+qemu-system-x86_64 -m 4096 -net user,hostfwd=tcp::2222-:22 -net nic -cdrom debian-9.5.0-amd64-netinst.iso -boot d /tmp/hda.qcow2
+----
+cd /dev/disk/by-id
+fdisk <disk_name>
+n -- p -- -- -- -- +4G // partition primaire (1) de 4G en ext4
+n -- e -- -- -- -- -- // partition étendue (2) d'1G
+a -- 1 // première partition bootable
+t -- 2 -- 82 // on change le format de la seconde partition pour du swap
+w // on valide les changements
+--
+cd ..
+mkfs.ext4 sda1
+mkswap sda2
+cd ..
+mkdir target
+mount -t ext4 /dev/sda1 /target
+debootstrap --variant=minbase stretch /target
+mount -t proc none /target/proc
+mount -o bind /dev /target/dev
+mount -t sysfs none /target/sys
+chroot /target /bin/bash

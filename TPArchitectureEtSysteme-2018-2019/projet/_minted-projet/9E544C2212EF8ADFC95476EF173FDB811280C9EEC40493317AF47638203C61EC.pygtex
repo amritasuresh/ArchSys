@@ -1,0 +1,17 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZsh{}include}\PYG{c+cpf}{\PYGZlt{}stdio.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{c+cpf}{\PYGZlt{}stdlib.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{c+cpf}{\PYGZlt{}stdint.h\PYGZgt{}}
+
+\PYG{k+kt}{int} \PYG{n+nf}{main}\PYG{p}{(}\PYG{k+kt}{int} \PYG{n}{argc}\PYG{p}{,} \PYG{k+kt}{char} \PYG{o}{*}\PYG{n}{argv}\PYG{p}{[])} \PYG{p}{\PYGZob{}}
+  \PYG{k+kt}{void} \PYG{o}{*}\PYG{n}{sp} \PYG{o}{=} \PYG{n+nb}{NULL}\PYG{p}{;}
+  \PYG{k+kt}{int} \PYG{o}{*}\PYG{n}{hp} \PYG{o}{=} \PYG{n}{malloc}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{);}
+  \PYG{k+kt}{int} \PYG{o}{*}\PYG{n}{hp2} \PYG{o}{=} \PYG{n}{malloc}\PYG{p}{(}\PYG{l+m+mi}{4}\PYG{p}{);}
+  \PYG{n}{printf}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZpc{}p}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s}{\PYGZdq{}}\PYG{p}{,} \PYG{p}{(}\PYG{k+kt}{void} \PYG{o}{*}\PYG{p}{)}\PYG{o}{\PYGZam{}}\PYG{n}{sp}\PYG{p}{);}
+  \PYG{n}{printf}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZpc{}p}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s}{\PYGZdq{}}\PYG{p}{,} \PYG{p}{(}\PYG{k+kt}{int} \PYG{o}{*}\PYG{p}{)} \PYG{n}{hp}\PYG{p}{);}
+  \PYG{n}{printf}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZpc{}p}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s}{\PYGZdq{}}\PYG{p}{,} \PYG{p}{(}\PYG{k+kt}{int} \PYG{o}{*}\PYG{p}{)} \PYG{n}{hp2}\PYG{p}{);}
+  \PYG{n}{printf}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZpc{}ld}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s}{\PYGZdq{}}\PYG{p}{,} \PYG{p}{(}\PYG{k+kt}{long} \PYG{k+kt}{int}\PYG{p}{)} \PYG{p}{(((}\PYG{k+kt}{intptr\PYGZus{}t}\PYG{p}{)} \PYG{o}{\PYGZam{}}\PYG{n}{sp} \PYG{o}{\PYGZhy{}} \PYG{p}{(}\PYG{k+kt}{intptr\PYGZus{}t}\PYG{p}{)} \PYG{n}{hp}\PYG{p}{)}\PYG{o}{/}\PYG{l+m+mi}{8}\PYG{p}{));}
+  \PYG{n}{printf}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZpc{}p}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s}{\PYGZdq{}}\PYG{p}{,} \PYG{o}{\PYGZam{}}\PYG{n}{main}\PYG{p}{);}
+  \PYG{k}{return} \PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

@@ -1,0 +1,181 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+\projettrue
+
+\newcommand{\titreprojet}{RIM : Run In Memory Linux}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\titreprojet}
+
+\begin{introduction}
+Un <<RIM Linux>> est un système d'exploitation Linux dit <<live>>, c'est à dire qu'il ne nécessite pas d'installation sur le disque dur. Le système est chargé intégralement et fonctionne en mémoire vive (RAM). Le projet est de réaliser votre propre distribution GNU/Linux sous la forme d'un RIM Linux intégrant le shell développé lors des séances de TP.
+\end{introduction}
+
+
+\section*{Objectifs}
+
+Vous fournirez une image iso bootable de CD-ROM qui permettra de démarrer votre distribution GNU/Linux 64 bits.
+
+Votre distribution devra fonctionner sous une machine virtuelle VirtualBox 64 bits.
+
+Vous utiliserez le bootloader <<isolinux>> ($\ge$ 6.03) pour démarrer votre environnement.
+
+Votre distribution utilisera un noyau \textbf{monolithique} récent ($\ge$ 4.9) que vous aurez compilé et personnalisé afin qu'il garantisse une connexion au réseau dans une machine VirtualBox.
+
+La taille du noyau influera sur la note (un kernel de plus de 30M est monstrueusement énorme quand un autre de moins de 2M peut faire le même travail…), mais le système résultant devra rester fonctionnel (réseau, inputs, etc) et permettre de monter des disques IDE SCSI et SATA disposant de partitions EXT2,3,4 et XFS.
+
+Votre système utilisera un \textbf{initramfs} peuplé par une version de Busybox ($\ge$ 1.25.1) que vous aurez compilée et des bibliothèques de votre système dont vous aurez besoin.
+
+Un message d'accueil indiquera comment passer votre système en clavier Français ou Anglais.
+
+Vous utiliserez mkisofs pour générer l'image iso finale.
+
+Vous pouvez ajouter toutes les évolutions qui vous conviendrons à votre distribution.
+
+Plus votre système sera soigné, meilleure sera la note. 
+
+Vous rendrez, en plus de votre image iso, une documentation \LaTeX~complète (sources + PDF) de la création de votre live et tous les fichiers de configuration permettant de reproduire votre distribution.
+
+Notez que vous n'aurez pas besoin des droits administrateur pour générer votre distribution.
+
+\begin{solution}
+
+ \begin{enumerate}
+  \item télécharger les source du noyau et les extraire
+  \item copier la conf de la machine locale et faire un oldconfig
+\begin{verbatim}
+zcat /proc/config.gz > .config
+make oldconfig
+\end{verbatim}
+  \item compilation du noyau 
+\begin{verbatim}
+make -j3
+\end{verbatim}
+  \item téléchargement de busybox extraction, configuration et compilation 
+\begin{verbatim}
+make menuconfig
+make
+make install
+\end{verbatim}
+  \item création d'une racine de système, copie de busybox dans le répertoire :
+\begin{verbatim}
+mkdir root
+cp -a busybox-1.25.1/\_install/* root/
+\end{verbatim}
+  \item utilisation de l'init de busybox, dans le répertoire root : 
+\begin{verbatim}
+rm linuxrc
+ln -s bin/busybox init
+\end{verbatim}
+  \item récupération des bibliothèques via ldd busybox
+\begin{verbatim}
+ldd bin/busybox
+ linux-vdso.so.1 (0x00007ffc8ad1e000)
+ libm.so.6 => /usr/lib/libm.so.6 (0x00007ff38e850000)
+ libc.so.6 => /usr/lib/libc.so.6 (0x00007ff38e4b2000)
+ /lib64/ld-linux-x86-64.so.2 (0x00007ff38eb54000)
+\end{verbatim}
+  \item copie des bibliothèques dans notre système :
+\begin{verbatim}
+cp /usr/lib/libm.so.6 root/usr/lib/
+cp /usr/lib/libc.so.6 root/usr/lib/
+cp /lib64/ld-linux-x86-64.so.2 root/usr/lib/
+\end{verbatim}
+  \item création des liens (dans le répertoire root) :
+\begin{verbatim}
+ln -s usr/lib
+ln -s usr/lib lib64
+\end{verbatim}
+  \item strip des bibliothèques : 
+\begin{verbatim}
+cd root/
+ln -s usr/lib lib
+find lib -type f -exec strip {} \;
+\end{verbatim}
+  \item ajout du template (depuis la racine du nouveau système)
+\begin{verbatim}
+tar xpvf ../rim.linux.template.tbz2
+\end{verbatim}
+  \item génération de l'initramfs
+\begin{verbatim}
+find . -print | cpio -o -Hnewc | gzip > ../root.gz
+\end{verbatim}
+  \item télécharger syslinux et extraire les sources
+  \item créer la base du CD-ROM mkdir cdrom/isolinux
+  \item copier le binaire isolinux sur le futur CD 
+\begin{verbatim}
+cp syslinux-6.03/bios/core/isolinux.bin cdrom/isolinux/
+cp syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 cdrom/isolinux/
+\end{verbatim}
+  \item créer un fichier de configuration pour isolinux dans cdrom/isolinux/isolinux.cfg :
+\begin{verbatim}
+default 1
+
+# Boot other devices
+label a
+    localboot 0x00
+label b
+    localboot 0x80
+label c
+    localboot -1
+
+label 1
+    kernel /vmlinuz
+    append initrd=/root.gz rw root=/dev/null
+\end{verbatim}
+  \item placer le noyau dans le CDROM et l'initramfs :
+\begin{verbatim}
+cp root.gz cdrom/
+cp linux-4.9/arch/x86/boot/bzImage cdrom/vmlinuz
+cdrom
+|- isolinux
+|  |- ldlinux.c32
+|  |- isolinux.bin
+|  `- isolinux.cfg
+|- root.gz
+`- vmlinuz
+\end{verbatim}
+  \item générer l'image.
+\begin{verbatim}
+mkisofs -o first.iso -b isolinux/isolinux.bin -c isolinux/boot.cat \
+ -no-emul-boot -boot-load-size 4 -boot-info-table cdrom
+\end{verbatim}
+
+ \end{enumerate}
+
+\end{solution}
+
+\section*{Quelques outils}
+
+\subsection*{Une trame}
+
+Dans le répertoire "\textasciitilde{}fhh/share/tp/projet" du département informatique, vous trouverez dans l'archive "rim.linux.template.tbz2", une trame de système offrant le minimum indispensable à la création de votre distribution.
+
+\subsection*{isolinux}
+
+isolinux est un boot loader distribué dans l'archive de Syslinux (\url{http://www.syslinux.org}).
+
+Vous trouverez dans le répertoire "\textasciitilde{}fhh/share/tp/projet" du département informatique un exemple de configuration d'isolinux.
+
+\subsection*{Busybox}
+
+Busybox (\url{https://busybox.net/}) est un projet regroupant une multitude d'outils UNIX dans un seul binaire dont le comportement est modifié en fonction du lien pointant sur le binaire.
+
+\section*{Conseils}
+
+Commencez par créer une image bootable de CD-ROM. Vous y ajouterez ensuite votre shell.
+
+En ce qui concerne le kernel, commencez par le noyau générique de votre distribution que vous allègerez par la suite.
+
+\end{document}

@@ -1,0 +1,296 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+\usepackage{tikz}
+
+% Numéro du TP
+\newcommand{\numtd}{03}
+% Titre du TP
+\newcommand{\titretd}{Circuits logiques}
+\def\tup#1{\langle #1\rangle}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+\begin{introduction}
+ Page web du cours :
+ \begin{center}
+  \url{http://www.lsv.ens-cachan.fr/~schwoon/enseignement/systemes/ws1718/}
+ \end{center}
+
+ Utilisez la page suivante pour construire vos circuits :
+ \begin{center}
+  \url{http://www.neuroproductions.be/logic-lab/}
+ \end{center}
+\end{introduction}
+
+\section{Codeur}
+
+Un \emph{codeur} est l'opposé du \emph{décodeur} discuté en cours ;
+il prend $2^k$ signaux en entrée ($x_0\cdots x_{2^k-1}$) et fournit un
+vecteur de $k$ sorties $y_{k-1}\cdots y_0$ représentant une valeur $y$.
+Si $k$ est fixe, on parle d'un $k$-codeur.
+Dans un codeur, on suppose qu'exactement une des entrées a la valeur 1,
+disons $x_i$. Dans ce cas, la valeur binaire des sorties doit être $i$.
+Le comportement pour d'autres cas n'est pas spécifié.
+
+\begin{enumerate}
+ \item Construire un 1-codeur (trivial) et un 2-codeur.
+
+\begin{solution}
+
+ Table de vérité pour le 1-codeur :
+ \begin{tabular}{|cc|c|}
+  \hline
+  $x_1$ & $x_0$ & $y_0$ \\
+  \hline
+  0 & 1 & 0 \\
+  1 & 0 & 1 \\
+  \hline
+ \end{tabular}
+
+ Du coup, on branche simplement $y_0$ sur $x_1$.
+
+\bigskip
+
+ Table de vérité pour le 2-codeur : 
+ \begin{tabular}{|cccc|cc|}
+  \hline
+  $x_3$ & $x_2$ & $x_1$ & $x_0$ & $y_1$ & $y_0$ \\
+  \hline
+  0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 1 \\
+  0 & 1 & 0 & 0 & 1 & 0 \\
+  1 & 0 & 0 & 0 & 1 & 1 \\
+  \hline
+ \end{tabular}
+
+ On obtient $y_0 = x_1\lor x_3$ et $y_1=x_2\lor x_3$.
+\end{solution}
+
+ \item Construisez un 2-codeur avec l'application web mentionnée ci-dessus.
+
+ \item Comment géneraliser la construction pour un $k$ quelconque ?
+	Quelle est la taille et la profondeur de votre construction
+	par rapport à $k$ ?
+
+\begin{solution}
+En général, $y_i$ est la disjonction de tous les $x_j$ où le $i$-ème
+bit de l'écriture binaire de $j$ est 1. Ceci est le cas pour la moitié
+des indices, à savoir dans $2^{k-1}$ cas. Pour faire un `ou' de $m$
+variables, on utilise $m-1$ portes OU avec une profondeur de
+$\lceil \log_2m\rceil$. Du coup, un circuit construit na\"\i{}vement
+obtiendrait une taille de $k\cdot (2^{k-1}-1)$ portes OU et profondeur $k-1$.
+Notons que la taille du circuit est dans $2^{\mathcal{O}(k)}$ mais pas
+dans $\mathcal{O}(2^k)$.
+
+On peut pourtant faire mieux. Par exemple, pour $k=4$, $y_3=x_8\lor\cdots\lor x_{15}$. Or, $x_{12}\lor\cdots\lor x_{15}$ apparaît aussi dans la formule pour
+$y_2$ (avec profondeur 2) et $x_{10}\lor x_{11}$ dans $y_1$ (avec profondeur 1).
+Pour $i,j$ tel que $j=i+2^k$, notons $Cod(i,j):=\tup{y_{k-1}\cdots y_0,
+b_0\cdots b_k}$ un circuit qui prend en entrée $x_i\cdots x_{j-1}$ et tel que
+\begin{enumerate}
+\item $y_{k-1}\cdots y_0$ sont le résultat d'un codeur pour ces signaux
+  (traités comme $x_0\cdots x_{2^k-1}$);
+\item $b_0\cdots b_k$ sont des signaux dont la disjonction donne
+  $x_i\lor\cdots\lor x_j$.
+\end{enumerate}
+Concrètement, pour $k=1$, on définit $Cod(i,j):=\tup{x_{i+1},x_ix_{i+1}}$.
+Par récurrence, pour $k$ quelconque, soit $j=i+2^k$, $\ell=j+2^k$, et
+$Cod(i,j)=\tup{z_{k-1}\cdots z_0,c_0\cdots c_k}$ et
+$Cod(j,\ell)=\tup{v_{k-1}\cdots v_0,d_0\cdots d_k}$.
+Pour $n=0,\ldots,k-1$, soit $y_n:=z_n\lor v_n$,
+et $s:=(((d_0\lor d_1)\lor d_2) \lor \cdots)\lor d_k$,
+alors on pose $Cod(i,\ell):=\tup{sy_{k-1}\cdots y_0,c_0\cdots c_ks}$.
+On vérifie que $Cod(i,\ell)$ vérifie les items (a) et (b) avec profondeur
+$k-1$, et que pour le nombre de portes OU :
+\begin{itemize}
+\item $n_1:=|Cod(0,2)|=0$ ;
+\item $n_{k+1} := |Cod(0,2^{k+1})| = 2n_k + 2k$.
+\end{itemize}
+On prouve que $n_k=2^{k+1}-2k-2$ pour tout $k$ :
+\begin{itemize}
+\item C'est la cas pour $k=1$ : $n_1=2^2-2\cdot1-2=0$.
+\item Par récurrence, $n_{k+1}=2n_k+2k=2\cdot(2^{k+1}-2k-2)+2k=
+	2^{k+2} -4k-4+2k = 2^{k+2}-2(k+1)-2$.
+\end{itemize}
+Du coup, le circuit construit ainsi est de taille $\mathcal{O}(2^k)$.
+
+
+\end{solution}
+
+\end{enumerate}
+
+\section{Codeur de priorité}
+
+Un \emph{codeur de priorité} (CP) est comme un codeur, mais il gère le
+cas où plusieurs entrées ont la valeur 1. Dans ce cas, $y$ prend
+la valeur du plus grand indice $i$ tel que $x_i=1$. Une autre sortie $z$
+indique si au moins un des $x_i$ était $1$. Si $z=0$, la valeur de $y$
+n'est pas spécifiée.
+
+\begin{enumerate}
+ \item Selon vous, à quoi peut servir un tel circuit ?
+\begin{solution}
+Par exemple, pour les interruptions ; certains périphériques sont plus
+importants que d'autres, on sélectionne celui qui est le plus important.
+\end{solution}
+
+ \item Construisez un CP pour 2, puis 4 signaux avec l'application web.
+
+\begin{solution}
+Pour 2 signaux, on met $y_0=x_1$ et $z=x_0\lor x_1$.\\
+Pour 4 signaux, suivre la construction dans la question suivante.
+\end{solution}
+
+ \item Construire un $(k+1)$-CP à partir de deux $k$-CP.
+
+\begin{solution}
+
+\bigskip
+
+{\centering
+\begin{tikzpicture}
+
+% signaux en entrée
+\draw[->] (-2,4)--(0,4); \draw (-0.9,4.2)--(-1.1,3.8);
+\node at (-1,4.4) {$2^k$};
+\draw[->] (-2,1)--(0,1); \draw (-0.9,1.2)--(-1.1,0.8);
+\node at (-1,1.4) {$2^k$};
+
+% les deux CP
+\draw[fill=white] (0,0)--(3,0)--(3,2)--(0,2)--(0,0);
+\node at (1.5,1) {$k$-CP};
+\draw[fill=white] (0,3)--(3,3)--(3,5)--(0,5)--(0,3);
+\node at (1.5,4) {$k$-CP};
+
+% la porte ou
+\draw[fill=white] (5,4)--(6,4)--(6,5)--(5,5)--(5,4);
+\node at (5.5,4.5) {$\lor$};
+\draw[->] (3,4.66)--(5,4.66);
+\draw[->] (3,0.33)--(4,0.33)--(4,4.33)--(5,4.33);
+\node at (3.3,4.8) {$z_0$};
+\node at (3.3,0.5) {$z_1$};
+\draw[->] (6,4.5)--(9,4.5);
+\node at (9.3,4.5) {$z$};
+
+% le MUX
+\draw[fill=white] (5.5,1.5)--(7.5,1.5)--(7.5,3.5)--(5.5,3.5)--(5.5,1.5);
+\node at (6.5,2.5) {MUX};
+\draw[->] (3,3.33)--(5,3.33)--(5,3.0)--(5.5,3.0); \draw (3.5,3.53)--(3.3,3.13);
+\draw[->] (3,1.66)--(5,1.66)--(5,2.0)--(5.5,2.0); \draw (3.5,1.86)--(3.3,1.46);
+\node at (3.4,2.93) {$k$};
+\node at (3.4,2.06) {$k$};
+\draw[->] (4,0.33)--(6.5,0.33)--(6.5,1.5);
+\draw[->] (7.5,2.5)--(9,2.5);
+\draw (8.35,2.7)--(8.15,2.3); \node at (8.25,2.9) {$k$};
+\node at (10.0,2.5) {$y_0\cdots y_{k-1}$};
+
+% sortie y_k
+\draw[->] (6.5,0.33)--(9,0.33);
+\node at (9.3,0.33) {$y_k$};
+
+\draw[fill] (4,0.33) circle (0.06);
+\draw[fill] (6.5,0.33) circle (0.06);
+
+\end{tikzpicture}
+}
+
+Avec cette construction, la profondeur d'un $k$-CP est clairement
+de $\mathcal{O}(k)$ (on rajoute un seul $\lor$ et un seul MUX lorsqu'on
+augmente la profondeur). Par le même type d'argument, la taille est de
+$\mathcal{O}(2^k)$.
+
+Plus précisement, pour l'implementation dans Scala, le nombre de portes
+NAND est de $n_1=3$ pour $k=1$ (taille d'un porte OU) et pour $k\ge1$ :
+$$n_{k+1}=2n_k+3+8k$$
+(où 8 est la taille d'un MUX). Si on résout la récurrence, pour tout $k\ge1$
+on a $n_k=2^{k+4}-2^{k+2}-2^k-8k-11$ (ce qui prouve encore que la taille
+est en $\mathcal{O}(n)$.
+
+\end{solution}
+
+ \item Construire un $2k$-CP à partir des $k$-CP.
+
+\begin{solution}
+
+\bigskip
+
+{\centering
+\begin{tikzpicture}
+
+% signaux en entrée
+\draw[->] (-1,4.5)--(1,4.5); \draw (0.1,4.7)--(-0.1,4.3);
+\node at (0,4.9) {$2^k$};
+\draw[->] (-1,0.5)--(1,0.5); \draw (0.1,0.7)--(-0.1,0.3);
+\node at (0,0.1) {$2^k$};
+
+\node at (0,1.5) {$\vdots$};
+\node at (0,2.5) {$\vdots$};
+\node at (0,3.5) {$\vdots$};
+\node at (2,1.5) {$\vdots$};
+\node at (2,2.5) {$\vdots$};
+\node at (2,3.5) {$\vdots$};
+\node at (4.8,4.4) {$\vdots$};
+\node at (7.8,1.4) {$\vdots$};
+
+% les CP
+\draw[fill=white] (1,0)--(3,0)--(3,1)--(1,1)--(1,0);
+\node at (2.0,0.5) {$k$-CP};
+\draw[fill=white] (1,4)--(3,4)--(3,5)--(1,5)--(1,4);
+\node at (2.0,4.5) {$k$-CP};
+
+% le CP supplémentaire
+\draw[fill=white] (5,3.8)--(7,3.8)--(7,4.8)--(5,4.8)--(5,3.8);
+\node at (6,4.3) {$k$-CP};
+\draw[->] (3,4.66)--(5,4.66);
+\draw[->] (3,0.33)--(4.5,0.33)--(4.5,3.93)--(5,3.93);
+\node at (3.3,4.8) {$z_0$};
+\node at (3.5,0.1) {$z_{2^k-1}$};
+\draw[->] (7,4.5)--(12,4.5);
+\node at (12.3,4.5) {$z$};
+
+% le MUX
+\draw[fill=white] (8,0.3)--(10,0.3)--(10,2.3)--(8,2.3)--(8,0.3);
+\node at (9,1.3) {MUX};
+\draw[->] (3,4.33)--(4.0,4.33)--(4.0,2.0)--(8,2.0); \draw (3.5,4.53)--(3.3,4.13);
+\draw[->] (3,0.66)--(8,0.66); \draw (3.5,0.86)--(3.3,0.46);
+\node at (3.4,3.93) {$k$};
+\node at (3.4,1.06) {$k$};
+\draw[->] (7,4.1)--(9,4.1)--(9,2.3);
+\draw (8.1,4.3)--(7.9,3.9); \node at (8,3.6) {$k$};
+\draw[->] (10,1.3)--(12,1.3);
+\draw (11.1,1.5)--(10.9,1.1); \node at (11,1.7) {$k$};
+\draw (11.1,3.4)--(10.9,3.0); \node at (11,3.6) {$k$};
+\node at (13.0,1.3) {$y_0\cdots y_{k-1}$};
+
+% sortie y_k
+\draw[->] (9,3.2)--(12,3.2);
+\draw[fill] (9,3.2) circle (0.06);
+\node at (13.0,3.2) {$y_k\cdots y_{2k-1}$};
+
+\end{tikzpicture}
+}
+
+Attention, le MUX n'est pas de profondeur constante mais de $\mathcal{O}(k)$
+car il prend en compte $k$ bits de sélection. Du coup, cette construction
+donne elle aussi un circuit de profondeur $\mathcal{O}(k)$ pour un $k$-CP.
+
+Par ailleurs, il s'avère que le circuit résultant a exactement la même
+taille que la construction précedente, même si les signaux prennent
+des chemins différents.
+
+\end{solution}
+
+\end{enumerate}
+
+\end{document}

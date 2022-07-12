@@ -1,0 +1,9 @@
+#!/usr/bin/guile \
+-e main -s
+!#
+(define (main args)
+  (let ((pid (primitive-fork)))
+    (if (= pid 0)
+        (...)
+        (...))))
+...

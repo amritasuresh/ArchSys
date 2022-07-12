@@ -1,0 +1,90 @@
+% Model checking course
+
+\documentclass{beamer}
+% \usepackage{folien}
+% \usepackage{amsfonts}
+
+\begin{document}
+
+% --------------------------------------------------------------------------
+
+\begin{frame}{Leader-election protocol}
+
+\o The following protocol is due to Dolew, Klawe, Rodeh (1982).
+
+\o The protocol consists of $n$ participants (where $n$ is a parameter).
+   The participants are connected by a ring of unidirectional message channels.
+   Communication is asynchronous, and the channels are reliable. Each
+   participant has a unique ID (e.g., some random number).
+
+\o \textbf{Goal:} The participants communicate to elect a ``leader''
+   (i.e., some distinguished participant). The protocol shown here
+   ensures low communication overhead ($\cal O(n\log n)$ messages;
+   most naïve protocols have quadratic message overhead).
+
+\end{frame}
+
+% --------------------------------------------------------------------------
+
+\begin{frame}{Leader-election protocol}
+
+\o Participants are either active or inactive.
+   Initially, all participants are \emph{active}.
+
+\o The protocol proceeds in rounds. In each round, at least
+   half of the participants will become inactive. (As a consequence,
+   there are at most $\cal O(\log n)$ rounds.
+
+\o In each round every active participant receives the numbers
+   of the two nearest active participants (in incoming direction).
+   A participant remains active only if the value of the nearest
+   neighbour is the largest of the three. (In the following slides, the
+   participant adopts this largest number as its own; this is optional.)
+
+\o The last remaining active participant is declared the leader.
+
+\end{frame}
+
+% --------------------------------------------------------------------------
+
+\begin{frame}{Leader Election: Example}
+
+\o \centerline{\includegraphics[height=13cm]{lep1}}
+
+\end{frame}
+
+% --------------------------------------------------------------------------
+
+\begin{frame}{Leader Election: First round}
+
+\o \centerline{\includegraphics[height=13cm]{lep2}}
+
+\end{frame}
+
+% --------------------------------------------------------------------------
+
+\begin{frame}{Leader Election: Result of the first round}
+
+\o \centerline{\includegraphics[height=13cm]{lep3}}
+
+\end{frame}
+
+% --------------------------------------------------------------------------
+
+\begin{frame}{Leader Election: Second round}
+
+\o \centerline{\includegraphics[height=13cm]{lep4}}
+
+\end{frame}
+
+% --------------------------------------------------------------------------
+
+\begin{frame}{Leader Election: Result of second round}
+
+\o \centerline{\includegraphics[height=13cm]{lep7}}
+
+\end{frame}
+
+% ----------------------------------------------------------------------
+
+\end{document}

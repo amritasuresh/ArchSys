@@ -1,0 +1,50 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZsh{}include} \PYG{c+cpf}{\PYGZlt{}sys/types.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include} \PYG{c+cpf}{\PYGZlt{}sys/stat.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include} \PYG{c+cpf}{\PYGZlt{}fcntl.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include} \PYG{c+cpf}{\PYGZlt{}unistd.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include} \PYG{c+cpf}{\PYGZlt{}stdio.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include} \PYG{c+cpf}{\PYGZlt{}stdlib.h\PYGZgt{}}
+\PYG{k+kt}{int} \PYG{n+nf}{main}\PYG{p}{(}\PYG{k+kt}{int} \PYG{n}{argc}\PYG{p}{,} \PYG{k+kt}{char} \PYG{o}{**}\PYG{n}{argv}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+  \PYG{k+kt}{int} \PYG{n}{fd1}\PYG{p}{,} \PYG{n}{fd2}\PYG{p}{,} \PYG{n}{rc}\PYG{p}{;}
+  \PYG{k+kt}{char} \PYG{n}{buf}\PYG{p}{;}
+  \PYG{k}{if}\PYG{p}{(}\PYG{n}{argc} \PYG{o}{!=} \PYG{l+m+mi}{3}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{n}{fprintf}\PYG{p}{(}\PYG{n}{stderr}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}Syntaxe: \PYGZpc{}s f1 f2}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{argv}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]);}
+    \PYG{n}{exit}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{);}
+  \PYG{p}{\PYGZcb{}}
+
+  \PYG{n}{fd1} \PYG{o}{=} \PYG{n}{open}\PYG{p}{(}\PYG{n}{argv}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{O\PYGZus{}RDONLY}\PYG{p}{);}
+  \PYG{k}{if}\PYG{p}{(}\PYG{n}{fd1} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{0}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{n}{perror}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}open(fd1)\PYGZdq{}}\PYG{p}{);}
+    \PYG{n}{exit}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{);}
+  \PYG{p}{\PYGZcb{}}
+
+  \PYG{n}{fd2} \PYG{o}{=} \PYG{n}{open}\PYG{p}{(}\PYG{n}{argv}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{],} \PYG{n}{O\PYGZus{}WRONLY} \PYG{o}{|} \PYG{n}{O\PYGZus{}CREAT} \PYG{o}{|} \PYG{n}{O\PYGZus{}TRUNC}\PYG{p}{,} \PYG{l+m+mo}{0666}\PYG{p}{);}
+  \PYG{k}{if}\PYG{p}{(}\PYG{n}{fd2} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{0}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{n}{perror}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}open(fd2)\PYGZdq{}}\PYG{p}{);}
+    \PYG{n}{exit}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{);}
+  \PYG{p}{\PYGZcb{}}
+  \PYG{k}{while}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{n}{rc} \PYG{o}{=} \PYG{n}{read}\PYG{p}{(}\PYG{n}{fd1}\PYG{p}{,} \PYG{o}{\PYGZam{}}\PYG{n}{buf}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{);}
+    \PYG{k}{if}\PYG{p}{(}\PYG{n}{rc} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{0}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+      \PYG{n}{perror}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}read\PYGZdq{}}\PYG{p}{);}
+      \PYG{n}{exit}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{);}
+    \PYG{p}{\PYGZcb{}}
+    \PYG{k}{if}\PYG{p}{(}\PYG{n}{rc} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{)}
+    \PYG{k}{break}\PYG{p}{;}
+    \PYG{n}{rc} \PYG{o}{=} \PYG{n}{write}\PYG{p}{(}\PYG{n}{fd2}\PYG{p}{,} \PYG{o}{\PYGZam{}}\PYG{n}{buf}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{);}
+    \PYG{k}{if}\PYG{p}{(}\PYG{n}{rc} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{0}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+      \PYG{n}{perror}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}write\PYGZdq{}}\PYG{p}{);}
+      \PYG{n}{exit}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{);}
+    \PYG{p}{\PYGZcb{}}
+    \PYG{k}{if}\PYG{p}{(}\PYG{n}{rc} \PYG{o}{!=} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+      \PYG{n}{fprintf}\PYG{p}{(}\PYG{n}{stderr}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}Ecriture interrompue\PYGZdq{}}\PYG{p}{);}
+      \PYG{n}{exit}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{);}
+    \PYG{p}{\PYGZcb{}}
+  \PYG{p}{\PYGZcb{}}
+  \PYG{n}{close}\PYG{p}{(}\PYG{n}{fd1}\PYG{p}{);}
+  \PYG{n}{close}\PYG{p}{(}\PYG{n}{fd2}\PYG{p}{);}
+  \PYG{k}{return} \PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

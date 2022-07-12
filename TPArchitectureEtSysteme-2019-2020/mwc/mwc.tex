@@ -1,0 +1,122 @@
+\documentclass{exam}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{hyperref}
+\usepackage{listings}
+\lstset{
+  language=C,
+  basicstyle=\ttfamily
+}
+\usepackage{dirtree}
+\setmainlanguage{french}
+
+\title{Multi Core Unix wc}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+
+On se propose de réimplémenter l'utilitaire unix \texttt{wc} en multi-c\oe{}urs.
+\texttt{whatis} nous dit
+\begin{verbatim}
+wc (1)       - print newline, word, and byte counts for each file
+\end{verbatim}
+
+En supposant que l'exécutable se nomme \texttt{mwc}, la commande
+\begin{verbatim}
+mwc -w FILE
+\end{verbatim}
+doit renvoyer le nombre de mots du fichier \verb|FILE|. Pour compter le nombre de 
+lignes, on utilisera \verb|mwc -l FILE|, et pour compter le nombre de caractères,
+\verb|mwc -c FILE|. Le cas sans option doit agir de la même manière qu'avec l'option \verb|-w|. 
+On ne traite qu'une seule option à la fois, le programme n'utilise pas l'entrée standard.
+
+Le comportement (et la sortie) de votre \texttt{mwc} doit donc être
+rigoureusement le même que celui du \texttt{wc} Unix à option
+identique (sauf le cas sans option).
+
+Le principe est de diviser le fichiers et d'attribuer un morceau de fichier par
+fil d'exécution.
+
+\url{http://www.lsv.fr/~hondet/resources/archos/mwc.tar.gz} contient un
+Makefile et une batterie de tests. Pour lancer les tests, \texttt{make
+  tests}. Pour générer des fichiers de taille arbitraire (pour tester
+les performances),
+\begin{verbatim}
+< /dev/urandom tr -dc '\n\t [:alnum:]' | head -cN > FILE
+\end{verbatim}
+où \texttt{N} est la taille du fichier et \texttt{FILE} est le fichier
+de sortie.
+
+\paragraph{Remarques}
+\begin{itemize}
+  \item On utilisera des headers (fichiers en \texttt{.h}).
+  \item On privilégiera les appels système\footnote{En règle générale, il vaut
+    mieux privilégier les appels de librairies, plus génériques et portables.}.
+    On utilisera donc \texttt{open} plutôt que \texttt{fopen} (\texttt{printf}
+    est autorisé).
+  \item Il faut toujours s'attendre à un échec d'un appel système. Afficher
+    l'erreur avec \texttt{perror} sera un traitement suffisant.
+  \item Le manuel Unix est très utile lorsqu'on programme avec les librairies
+    Unix, la section 2 est dédiée aux appels système, la section 3 concerne les
+    appels de librairie (les pages relatives à \texttt{pthread} sont en section
+    3).
+  \item On fera attention à ne pas avoir de fuites mémoire. Pour s'en assurer,
+    on peut utiliser l'outil \texttt{valgrind}:
+\begin{verbatim}
+valgrind ./mwc file.plain
+\end{verbatim}
+\end{itemize}
+
+\paragraph{Challenge}
+L'archive contient le binaire de ma solution (qui utilise 4
+c\oe{}urs). Comparez, et faites mieux.
+
+\paragraph{Modalités de rendu}
+Vous rendrez une archive tar compressée nommée \texttt{Nom\_Prénom.tar.gz}
+dont l'architecture sera:
+\dirtree{%
+  .1 Nom\_Prénom.
+  .2 readme.pdf.
+  .2 Makefile.
+  .2 main.c.
+  .2 main.h.
+  .2 additional files.c.
+  .2 additional files.h.
+  .2 tests.
+  .3 \dots.
+}
+où \texttt{readme.pdf} contient des indications si vous jugez cela nécessaire.
+On notera que les fichiers sont présents directement à la racine de l'archive.
+Le \texttt{Makefile} doit avoir deux cibles
+\begin{itemize}
+  \item \texttt{bin} qui permet de générer le binaire et
+  \item \texttt{tests} permettant de tester l'exécutable créé.
+\end{itemize}
+Pour rappel, une cible s'écrit
+\begin{verbatim}
+cible: dépendances
+	recette
+\end{verbatim}
+o\`u la recette est la commande déclenchée par la cible. Les dépendances peuvent
+être vides.
+
+La propreté du code influencera la note. Vous pouvez utiliser des
+embellificateurs de code comme
+\begin{itemize}
+  \item \url{http://astyle.sourceforge.net/} ou
+  \item \url{http://uncrustify.sourceforge.net/} ou encore
+  \item \url{https://clang.llvm.org/docs/ClangFormat.html}.
+\end{itemize}
+
+Vous trouverez une archive
+\url{http://www.lsv.fr/~hondet/resources/archos/mwc.tar.gz} pour
+démarrer. Elle contient l'arborescence demandée.
+Pour toute question, n'hésitez pas \`a contacter la hotline:
+\texttt{gabriel.hondet@lsv.fr}.
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

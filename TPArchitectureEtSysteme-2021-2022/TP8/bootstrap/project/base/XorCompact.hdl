@@ -1,0 +1,17 @@
+
+/**
+ * Exclusive-or gate:
+ * out = not (a == b)
+ */
+
+CHIP XorCompact {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    // Put your code here (use only NAND gates):
+    Nand(a=a,b=b,out=nandab);
+    Nand(a=a,b=nandab,out=nandaba);
+    Nand(a=b,b=nandab,out=nandbab);
+    Nand(a=nandbab,b=nandaba,out=out);
+}

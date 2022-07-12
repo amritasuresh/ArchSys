@@ -1,0 +1,168 @@
+\documentclass{exam}
+\usepackage{../main}
+\usepackage{amsmath}
+
+\if\answers0\noprintanswers\fi
+\if\answers1\printanswers\fi
+
+\title{Fils et semaphores}
+\begin{document}
+\maketitle
+
+\begin{questions}
+\titledquestion{Spinlock v. Mutex}
+Quelle est la différence entre un \textit{spinlock} et un
+\textit{mutex}? Pour mettre en évidence cette différence, téléchargez
+\url{http://www.lsv.fr/~hondet/resources/archos/spinvmut.c} et complétez le
+de manière a ce que le fil \texttt{stupid} s'accapare le spinlock et
+que \texttt{wants} soit forcé d'attendre la libération de la
+ressource (exclusion mutuelle).
+
+La commande \verb|time cmd| mesure le temps d'occupation CPU en mode kernel
+(\textit{sys}), le  temps d'occupation CPU en mode utilisateur (\textit{user})
+et le temps réel (\textit{real}),
+écoulé, présenté sous la forme
+\begin{verbatim}
+real    0m0.000s
+user    0m0.000s
+sys     0m0.000s
+\end{verbatim}
+si vous utilisez la command \textit{bash}. Il existe aussi un binaire
+\verb|time|, qui présente les résultats de cette manière,
+\begin{verbatim}
+0.00user 0.00system 0:00.00elapsed ?%CPU (0avgtext+0avgdata 1808maxresident)k
+\end{verbatim}
+où le temps réel est noté \textit{elapsed}.
+
+Que donnera un appel à \verb|time spinvmut| concernant le temps réel et le temps
+CPU? Modifiez le code pour utiliser des mutex à la place. Comment devrait
+évoluer le temps réel et le temps CPU, en lançant \verb|time spinvmut|?
+Vérifiez.
+
+\begin{solution}
+  Version avec spinlocks,
+  \inputminted{C}{corrected/spinvmut.c}
+  ce qui donne, par un appel à \verb|time|,
+  \begin{verbatim}
+  At last!
+
+  real    0m4.002s
+  user    0m2.998s
+  sys     0m0.004s
+  \end{verbatim}
+  Version avec mutex,
+  \inputminted{C}{corrected/spinvmut_mut.c}
+  ce qui donne, par un appel à \verb|time|,
+  \begin{verbatim}
+  At last!
+
+  real    0m4.002s
+  user    0m0.003s
+  sys     0m0.004s
+  \end{verbatim}
+  où l'on voit que, bien que les temps réels soient égaux, on a un différence
+  entre les temps CPU: le \textit{spinlock}, car il réalise une attente active,
+  occupe le processeur, on a donc un temps CPU élevé. Le \textit{mutex}, réalisant
+  une attente passive, libère les ressources, et prend donc peu de temps CPU.
+\end{solution}
+
+\titledquestion{La fonction d'Hénon, partie II}
+On va (re) calculer l'orbite d'un système dynamique de dimension 2. La fonction
+d'Hénon est définie par le système
+\begin{equation}
+  \label{eq:1}
+  H_{a,b} = \left\{
+    \begin{aligned}
+      x_{n + 1} &= a - by_{n} - x_{n}^{2} \\
+      y_{n + 1} &= x_{n}.
+    \end{aligned}
+    \right.
+\end{equation}
+On utilisera un thread pour calculer la suite \( (x_n)_n \) et un
+autre thread pour la suite \( (y_n)_n \).
+
+Proposez un moyen de synchronisation permettant d'assurer
+l'entrelacement des calculs de \( x_n \) et de \( y_n \). Mettez le en
+\oe{}uvre.
+
+On peut ensuite créer un modèle dit producteur consommateur:
+\begin{itemize}
+\item un thread calcule l'orbite et stocke les données dans un buffer
+  tournant,
+  \item l'autre thread lit les données du buffer et les écrit dans un fichier.
+\end{itemize}
+Le fichier \texttt{henon.dat} sera sous la forme
+\texttt{0.3415 1.2451} où le premier nombre est $x_{n}$ et le deuxième $y_{n}$.
+
+On pourra tracer la fonction avec la commande \texttt{gnuplot henon.p} après
+avoir téléchargé le script
+\url{http://www.lsv.fr/~hondet/resources/archos/henon.p}. Cela produira un
+fichier \texttt{henon.png}.
+
+Pour \( a = 1.4 \) et \( b = -0.3 \), la fonction est chaotique (au sens de
+Devaney), c'est-à-dire,
+\begin{itemize}
+  \item la fonction est sensiblement dépendante des conditions initiales (effet
+    papillon, imprédictabilité);
+  \item la fonction est topologiquement transitive (indécomposabilité);
+  \item les points périodiques sont denses dans le domaine de définition de
+    $H_{a, b}$ (régularité).
+\end{itemize}
+et possède un attracteur étrange.
+
+Pour plus d'informations sur les systèmes dynamiques, voir \textit{An
+  introduction to Chaotic Dynamical Systems}, Robert~L.~Devaney, Westview.
+
+\begin{solution}
+  \paragraph{Simple}
+  \inputminted{C}{corrected/henon/henon_simple.c}
+  \paragraph{Producteur-consommateur}
+  \inputminted{C}{corrected/henon/henon_pc.c}
+\end{solution}
+
+\titledquestion{Mandelbrot}
+Soitcun nombre complexe. On considère la série \(z_0 = 0\) et 
+\(z_{n+1} = z_n^2 + c \) pour \(n \geq 0\).
+L’ensemble de Mandelbrot est défini comme l’ensemble des valeurs \(c \)
+telles que la série des \(z_n\) est bornée. On sait que cela est le cas si
+\(z_n\) ne sort jamais d’un cercle de rayon 2 autour de 0.
+Si jamais la série sort de ce cercle, soit \(m(c)\) le plus petit indice 
+\(n \) tel que c’est le cas. Une application populaire pour \(m(c)\) est de
+créer de jolies images ; on associe l’écran avec un rectangle et chaque pixel
+avec la valeur \(c\) qui y correspond ; le pixel est ensuite peint avec une couleur
+correspondant à \(m(c)\). La page web du cours contient un tel programme. Votre tâche
+consiste à l’accélérer en lançant plusieurs threads en parallèle.
+On peut utiliser \verb|cat /proc/cpuinfo| pour voir combien de c\oe urs une machine a.
+Chaque thread va donc travailler sur une partie différente de l’image.
+
+\titledquestion{Sémaphores inter processus (facultatif)}
+Les semaphores, bien qu'introduits avec les threads, permettent
+également la synchronisation inter processus. Pour ce faire, l'API
+System V fournit des procédures \textit{IPC} pour \textit{Inter
+Process Communication}. Par exemple, on peut obtenir des sémaphores
+via \texttt{semget}. Cette commande utilise des clefs IPC permettant
+d'identifier de manière unique un ensemble de sémaphores.
+
+Ces clefs peuvent être générées par la fonction \texttt{ftok}.
+
+Pour expérimenter un peu, écrivez un programme créant une clef et deux
+sémaphores avec cette clef. Lancez le programme et exécutez la
+commande \texttt{ipcs -s}. Que constate-t-on? On en déduira les
+précautions à prendre lorsque l'on utilise des clefs. La commande
+\texttt{ipcrm} existe.
+
+On peut maintenant implémenter la fonction d'Hénon multi processus
+avec des sémaphores. L'utilisation de sémaphores partagés reste assez
+fastidieuse.
+
+\begin{solution}
+  On donne un exemple d'utilisation des mémoires partagées, en deux programmes.
+  L'écrivain crée une mémoire et écrit dedans. Le lecteur va lire la mémoire.
+  \paragraph{Écrivain}
+  \inputminted{C}{corrected/shmem_writer.c}
+  \paragraph{Lecteur}
+  \inputminted{C}{corrected/shmem_reader.c}
+\end{solution}
+
+\end{questions}
+\end{document}

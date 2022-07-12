@@ -1,0 +1,209 @@
+\documentclass{exam}
+\usepackage{../main}
+
+\if\answers0\noprintanswers\fi
+\if\answers1\printanswers\fi
+
+\newcommand{\Cplx}{\ensuremath{\mathbb{C}}}
+
+\title{TP \( n + 2 \): Fils d'exécution et élections}
+\date{}
+\begin{document}
+\maketitle
+\begin{questions}
+  \titledquestion{Ensembles de Julia par itération inverse}
+On peut approcher l'ensemble de Julia d'une fonction complexe en
+itérant son inverse un nombre suffisant de fois. Étudions la
+(classique) fonction, avec \( c \in \Cplx \),
+\[
+  \begin{aligned}
+    Q_c : \Cplx &\to \Cplx\\
+    z &\mapsto z^2 + c
+  \end{aligned}
+\]
+On définit l'orbite \`a rebours comme
+\( \{ f_c^{-n}(z_{0}); n \in \mathbb{N} \} \).  Pour la calculer, on
+note que si \( z^2 + c = w \), alors \( z = \rho\exp(i\theta) \) avec
+\( \rho = \sqrt{|w - c|} \) et
+\( \theta = \frac{\vartheta}{2} + \delta \pi \) avec \( \delta \in \{
+0, 1 \} \) et
+\[ \vartheta = \arctan(\Im(w - c)/\Re(w - c)) +
+  \begin{cases}
+    0 & \text{si } \Re(w-c) > 0 \\
+    \pi & \text{sinon}
+  \end{cases}
+\]
+
+Le point initial \( w_0 \) n'a pas d'importance.  On se propose de
+créer un fil d'exécution par orbite, chaque orbite ayant un point
+initial différent.
+
+On notera les points ou bien sur la sortie standard, ou bien dans un
+fichier, chaque ligne étant de la forme \verb|x y|. Si les points sont notés
+dans un fichier nommé \verb|julia.dat|, on peut tracer avec la commande
+\verb|gnuplot julia.p| en supposant l'existence du script
+\cref{fig:gnuplot-julia}.
+\begin{figure}[h]
+\begin{verbatim}
+set terminal png size 500,500
+set output 'julia.png'
+set title 'Julia set'
+plot 'julia.dat'
+\end{verbatim}
+  \caption{Script gnuplot pour tracer l'ensemble de Julia à partir d'un fichier
+    de données \texttt{julia.dat}}\label{fig:gnuplot-julia}
+\end{figure}
+On n'oubliera pas d'importer \texttt{math.h} et
+\texttt{complex.h} et de compiler avec \texttt{-lm} en \emph{fin de
+  ligne de commande}. La commande suivant devrait convenir,
+\verb|gcc julia.c -lpthread -lm|.
+
+On pourra essayer de tracer l'ensemble de Julia avec les paramètres
+\( c \in \{ -1, -0.4 - 0.6i, -1.5, -i, -0.8 + 0.4i, 0.5, 3, 1 + i, 2
+\} \)
+
+\begin{solution}
+  \inputminted{C}{correc/julia.c}
+\end{solution}
+
+\titledquestion{Serveur de dates: exclusion mutuelle simple}
+On souhaite mettre en \oe{}uvre une architecture client serveur (sans pour
+autant utiliser l'API socket, on se contentera d'avoir des fils d'exécution
+client et un fil serveur) dans laquelle le serveur est chargé de
+fournir la date chaque fois que le client la demande.
+
+Le serveur tourne en boucle infinie. Il attend une requête de la part des
+clients. Une fois la requête reçue, il émet une chaîne de caractères contenant
+la date et l'heure à disposition du client. À ce moment là, le serveur est
+prêt à répondre à une autre requête.
+
+La tâche cliente exécutera 50 fois une fonction réalisant:
+\begin{itemize}
+  \item émission d'une requête au serveur,
+  \item récupération de la date envoyée au serveur,
+  \item affichage numéroté de la date.
+\end{itemize}
+\begin{parts}
+  \part{} Quelle information est partagée entre les threads? Quel moyen de
+  communication sera utilisé?
+  \part{} Quel moyen de synchronisation sera utilisé?
+  \part{} Implémenter la solution avec plus d'un client.
+\end{parts}
+
+\titledquestion{Élection d'un meneur}
+Un problème important dans la programmation concurrente est de choisir
+un \emph{leader}, e.g.\ pour l'organisation et la coordination d'un
+réseau. On part avec un nombre $n$ d'ordinateurs ou de processus (on
+parlera des \emph{nœuds}) à priori identiques, à l'exception d'un
+identifiant unique. En suivant un même protocole, tous les nœuds vont
+s'accorder sur le choix d'un leader.
+
+Il existe une grande variété de protocoles menant à ce résultat.  Nous
+allons dans ce TP en étudier et en réaliser un: le protocole Dolev,
+Klawe, and Rodeh qui se distingue par le faible nombre de messages
+échangé pour l'élection: $\mathcal{O}(n\log n)$. Par comparaison, les
+approches simples ont tendance à utiliser $\mathcal{O}(n^2)$ messages.
+Le protocole a été presenté en cours et les diapos explicatives sont
+aussi disponibles dans le répertoire du TD.\@
+
+Le protocole part du principe que les nœuds sont organiseés en anneau,
+chaque nœud envoie des messages à son voisin de droite.  Le répertoire
+du TP contient un squelette qui créera $n$ processus (les nœuds) pour
+$n$ donné; ces processus seront déjà équipés de pipes pour
+communiquer. Votre tâche est de compléter le programme en réalisant le
+protocole:
+
+\begin{itemize}
+\item Au départ, tous les nœuds sont \emph{actifs} et possèdent un
+  identifiant unique.
+
+\item Un nœud actif attend une petite période aléatoire (fonction
+  \texttt{delay()}), puis envoie son identifiant à son voisin de
+  droite. Ensuite, il attend les identifiants de ses \emph{deux} plus
+  proches voisins actifs à sa gauche.  Il décidera ensuite s'il reste
+  actif, devient passif, ou se déclare leader. Les conditions seront
+  précisées dans la présentation. S'il reste actif, il répète le
+  comportement présenté ci-dessus.
+
+\item Un nœud \emph{passif} transmet simplement tous les messages
+  reçus de gauche vers son voisin de droite. En plus, si le message
+  déclare un leader, il affiche un message correspondant à l'écran.
+
+\item Il y a trois types de messages échangés par les nœuds, tous dans
+  le format (\emph{type},\emph{identifiant}).
+
+  \begin{itemize}
+  \item ``voisin'' (v): pour envoyer son identifiant vers le voisin de
+    droite.
+  \item ``prochain'' (p): un nœud qui a reçu l'identifiant de son
+    voisin de gauche l'envoie vers son voisin de droite.
+  \item ``gagnant'' (g): un nœud se déclare leader.
+  \end{itemize}
+\end{itemize}
+
+Un code d'amorçage est disponible a l'adresse
+\url{http://www.lsv.fr/~hondet/resources/archos/ring.tar.gz}.
+
+\begin{parts}
+  \part{} Complétez la fonction <<protocole>> du fichier
+  <<ring-pipe.c>> qui implémente le protocole sus-décrit.
+  \begin{solution}
+    ring-pipe crée plusieurs processus reliés par des pipes.
+    \inputminted{C}{correc/ring/ring-pipe.c}
+  \end{solution}
+  \part{} Testez votre code avec plusieurs valeurs de $n$. Observez si
+  votre programme termine toujours et s'il y a toujours un seul
+  leader.
+  \begin{solution}
+    Au besoin réduire la valeur de DELAY pour $n$ grand.  Pour $n>255$
+    le code de sortie (obtenu par \texttt{wait} ne suffit plus pour
+    stocker l'identifiant du gagnant.
+  \end{solution}
+  \part{} La version réseau du programme, <<ring-net.c>> instancie un
+  seul n\oe{}ud par exécution. Vous pouvez recopier votre fonction
+  <<protocole>> depuis <<ring-pipe.c>>.
+  Le programme prend 3 arguments~: le port d'écoute du n\oe{}ud, le nom du nœud voisin (nom de
+  machine), le port de connexion au nœud voisin. Le programme crée un
+  serveur dans un thread et attend la connexion d'un voisin. En
+  parallèle, dans un autre thread, il tente une connexion sur son
+  voisin (nom de machine et port passés en argument). Écrivez un
+  script mettant en œuvre l'exécution de votre code sur 5 machines du
+  département. Commencez par tester l'exécution de votre code
+  localement (machine localhost en utilisant différents
+  ports). Étendre progressivement la taille de l'anneau.
+  \begin{solution}
+    \inputminted{C}{correc/ring/ring-net.c}
+  \end{solution}
+  \part{} Créez un anneau avec vos voisins et l'étendre à toute la
+  salle de TP.
+\end{parts}
+
+\titledquestion{Exclusion de Peterson}
+Nous proposons d'implémenter l'algorithme d'exclusion mutuelle de Peterson décrit sur Wikipedia.
+Le principe consiste à utiliser 3 variables \texttt{f0}, \texttt{f1} et \texttt{turn} pour gérer l'entrée dans la <<section critique>> du code.
+La <<section critique>> est la section contenant le code à protéger des accès concurents.
+Prouvez que algorithme assure l'exclusion mutuelle.
+\begin{parts}
+  \part{} En vous basant sur la page Wikipedia de cet algorithme :
+\begin{itemize}
+  \item modifiez la fonction \texttt{process0} et créez la fonction \texttt{process1} implémentant l'algorithme de Gary L. Peterson ;
+  \textbf{Note:}  \texttt{process0}  et  \texttt{process1} impléméntent la même fonctionnalité mais pour les threads 0 et 1.
+  \item Testez votre code et commentez.
+ \end{itemize}
+  \begin{solution}
+    https://www-ssl.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-system-programming-manual-325384.pdf Section 8-6 Vol. 3A 8.2.2 Memory Ordering in P6 and More Recent Processor Families
+
+    ou
+    \inputminted{C}{correc/peterson/peterson.c}
+  \end{solution}
+  \part{} En vous basant sur le code de \texttt{process0} et \texttt{process1} écrire la fonction \texttt{process} qui permettra l'invocation générique d'un thread.
+\part{} Toujours en vous basant sur la page Wikipedia de l'algorithme de Peterson, modifiez votre code pour 4 processus.
+\part{} Mêmes questions que précédemment pour l'algorithme de Dekker.
+\end{parts}
+\end{questions}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

@@ -1,0 +1,41 @@
+\BOOKMARK [1][-]{section.1}{First steps}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{File System}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Shell and Terminal}{section.1}% 3
+\BOOKMARK [1][-]{section.2}{Command line: first steps}{}% 4
+\BOOKMARK [2][-]{subsection.2.1}{Finding help}{section.2}% 5
+\BOOKMARK [3][-]{subsubsection.2.1.1}{Man pages}{subsection.2.1}% 6
+\BOOKMARK [3][-]{subsubsection.2.1.2}{Using the man pagesl}{subsection.2.1}% 7
+\BOOKMARK [3][-]{subsubsection.2.1.3}{Manual of the command ls}{subsection.2.1}% 8
+\BOOKMARK [3][-]{subsubsection.2.1.4}{Other ways to get help}{subsection.2.1}% 9
+\BOOKMARK [3][-]{subsubsection.2.1.5}{The command cd}{subsection.2.1}% 10
+\BOOKMARK [3][-]{subsubsection.2.1.6}{Wildcards}{subsection.2.1}% 11
+\BOOKMARK [3][-]{subsubsection.2.1.7}{Manuel of the command mkdir}{subsection.2.1}% 12
+\BOOKMARK [2][-]{subsection.2.2}{The command echo}{section.2}% 13
+\BOOKMARK [2][-]{subsection.2.3}{Other commands}{section.2}% 14
+\BOOKMARK [1][-]{section.3}{Redirections}{}% 15
+\BOOKMARK [2][-]{subsection.3.1}{First steps in redirection}{section.3}% 16
+\BOOKMARK [2][-]{subsection.3.2}{The pipe}{section.3}% 17
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Cat}{subsection.3.2}% 18
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Examples of pipe}{subsection.3.2}% 19
+\BOOKMARK [2][-]{subsection.3.3}{Input redirection}{section.3}% 20
+\BOOKMARK [1][-]{section.4}{Process Management}{}% 21
+\BOOKMARK [2][-]{subsection.4.1}{Process in the background}{section.4}% 22
+\BOOKMARK [2][-]{subsection.4.2}{Switching from one state to another}{section.4}% 23
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Application and process states}{subsection.4.2}% 24
+\BOOKMARK [2][-]{subsection.4.3}{Kill a process in foreground}{section.4}% 25
+\BOOKMARK [2][-]{subsection.4.4}{jobs}{section.4}% 26
+\BOOKMARK [2][-]{subsection.4.5}{Chaining processes}{section.4}% 27
+\BOOKMARK [3][-]{subsubsection.4.5.1}{First process chain}{subsection.4.5}% 28
+\BOOKMARK [3][-]{subsubsection.4.5.2}{More advanced chain}{subsection.4.5}% 29
+\BOOKMARK [1][-]{section.5}{The GNU/Linux operating system}{}% 30
+\BOOKMARK [2][-]{subsection.5.1}{Overview}{section.5}% 31
+\BOOKMARK [2][-]{subsection.5.2}{Questions}{section.5}% 32
+\BOOKMARK [1][-]{section.6}{The variables}{}% 33
+\BOOKMARK [2][-]{subsection.6.1}{Declaration}{section.6}% 34
+\BOOKMARK [2][-]{subsection.6.2}{Viewing}{section.6}% 35
+\BOOKMARK [2][-]{subsection.6.3}{Modification}{section.6}% 36
+\BOOKMARK [2][-]{subsection.6.4}{Exercices}{section.6}% 37
+\BOOKMARK [2][-]{subsection.6.5}{String of characters}{section.6}% 38
+\BOOKMARK [1][-]{section.7}{Some practical shortcuts}{}% 39
+\BOOKMARK [1][-]{section.8}{Test your knowledge}{}% 40
+\BOOKMARK [1][-]{section.9}{Bonus questions}{}% 41

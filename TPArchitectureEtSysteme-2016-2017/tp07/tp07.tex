@@ -1,0 +1,167 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{07}
+% Titre du TP
+\newcommand{\titretd}{Programmation d'un shell}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+\begin{introduction}
+L'objectif de cette séance est de créer votre propre shell.
+Enfin, pour rendre cela possible dans une seule séance certains travaux
+de programmation ennuyants ont déjà été faits, il suffit de remplir quelques
+trous dans le code.
+\end{introduction}
+
+\section{Programmer un shell}
+
+Vous trouverez un squelette
+de code sous l'adresse suivante :
+
+\url{http://www.lsv.fr/~schwoon/enseignement/systemes/ws1617/shell.zip}
+
+Le code existant sait déjà accepter une commande, découper une ligne en
+séparant les arguments, et d'exécuter une commande simple comme
+\texttt{cat toto}. En plus, le code existant connaît le syntaxe pour
+les redirections (\texttt{>}, \texttt{<}) et pour
+enchaîner plusieurs commandes avec \texttt{;}, \texttt{||}, \verb+&&+
+ou des tubes (\texttt{|}). Mais il ne sait pas, pour l'instant, comment
+réaliser ces choses.
+
+\subsection{Premiers essais}
+
+Téléchargez le code et compilez-le avec \texttt{make}, puis exécutez le
+shell. Vous verrez qu'une commande comme \texttt{ls} marche, mais qu'une
+commande avec redirections ou enchaînement affiche un simple message d'erreur.
+On termine le shell avec \verb-Ctrl+D-.
+
+Regardez le fichier \texttt{global.h}. Il contient la définition d'une simple
+structure de données qui représente le contenu d'une ligne de commande. Le
+parser du shell remplit une telle structure quand l'utilisateur saisit une
+commande. Quelques exemples :
+\begin{itemize}
+\item Commande simple (\texttt{cat toto}) : le champ \texttt{type} est
+  \verb+C_PLAIN+, \texttt{args} contient un tableau avec deux
+  éléments : \verb+{ "cat", "toto" }+. Ce qui est justement le format
+  demandé par \verb+execvp+, par hasard\ldots
+\item Commande avec redirection (\verb+cat toto > tata+) : comme avant,
+  mais le champ \verb+output+ contient \verb+"tata"+. Les autres redirections
+  sont dans \verb+append+, \verb+error+, et \verb+input+ qui représentent
+  \verb+>>+, \verb+2>+ et \verb+<+.
+\item Commande avec enchaînement (\verb+cat toto | wc+) : la structure devient
+  une arborescence avec un nœud du type \verb+C_PIPE+ dans la racine et deux
+  fils (champs \verb+left+, \verb+right+) représentant les commandes à gauche
+  et à droite. Les autres enchaînements sont représentés par les types
+  \verb+C_AND+ (\verb+&&+), \verb+C_OR+ (\verb+||+), \verb+C_SEQ+ (\verb+;+).
+\item Enfin, une commande est du type \verb+C_VOID+ quand l'utilisateur a mis
+  des parenthèses autour d'un groupe de commandes qui lui se trouve dans
+  le fils \texttt{left}. Le nœud \verb+C_VOID+ peut pourtant avoir ses propres
+  redirections.
+\end{itemize}
+
+Regarder maintenant le fichier \texttt{main.c} qui est normalement le seul
+que vous aurez besoin de modifier. La fonction \verb+execute+ prend en charge
+une structure et si elle est du type \verb+C_PLAIN+ sans redirection, elle
+sait quoi faire et renvoie le code de sortie de cette commande.
+À vous de compléter la fonction \ldots
+
+\subsection{Les enchaînements}
+
+Réalisez les enchaînements avec \verb+;+, \verb+||+ et \verb+&&+.
+On rappelle que \verb+||+ exécute la deuxième commande si la code
+de sortie de la première est non-zéro, et que \verb+&&+ celui-ci
+doit être zéro.
+
+\subsection{Redirections}
+
+Réalisez les redirections. On rappelle que pour un processus,
+le descripteur 0 est l'entrée standard, 1 la sortie standard
+et 2 la sortie erreur. Quelques fonctions utiles (regardez les
+pages man ou les transparents du cours pour plus d'informations) :
+\begin{itemize}
+\item \verb+open+ : ouvrir un fichier
+\item \verb+dup2+ : recopier un descripteur vers un autre
+\end{itemize}
+Par exemple, pour rediriger l'entrée standard, il va falloir changer le
+descripteur 0\ldots
+
+\subsection{Tubes}
+
+On s'occupe enfin des tubes. Pour un \verb+int fd[2]+ l'appel \verb+pipe(fd)+
+crée deux descripteurs. Les données écrites dans \verb+fd[1]+ sont disponibles
+pour lecture dans \verb+fd[0]+. Pour une commande comme \verb+cat toto | wc+
+votre shell doit donc lancer deux fils qui partagent un tube et qui font
+les bonnes manipulations sur leurs descripteurs avant de lancer les deux 
+commandes. Il convient de fermer tout descripteur inutile dans le père
+et les deux fils.
+
+\subsection{Gérer Ctrl-C}
+
+Essayez une commande comme \verb+cat+ sans arguments (qui attend simplement
+que l'utilisateur saisisse des données pour les répéter). La combinaison
+Ctrl-C interrompt cette commande mais, malheureusement, aussi le shell.
+Faites en sorte que le shell ne soit plus terminé par Ctrl-C mais que
+les processus fils le soient. Fonction utile : \texttt{signal}.
+
+\subsection{Changer de dossier}
+
+Malheureusement on ne peut pas se déplacer vers un autre dossier pour l'instant ;
+la commande \verb+cd ..+ échoue. Réalisez une commande interne du shell
+qui effectue un changement de dossier. Fonction utile : \texttt{chdir}.
+
+\section{Base de données}
+
+Cette exercice est destiné à ceux qui avancent vite. Le principe des pipes
+peut aussi être utilisé de façon interactive. Ceci vous permet de faire
+interagir votre programme avec d'autres programmes existants qui offrent
+des fonctionnalités puissantes. On va démontrer cet effet en connectant
+notre programme à une base de données.
+
+\subsection{Premiers essais}
+
+Téléchargez l'archive sous l'adresse
+
+\url{http://www.lsv.fr/~schwoon/enseignement/systemes/ws1617/departement.zip}
+
+Vous trouverez deux fichiers, un squelette de code (\texttt{departement.c})
+et une base de données (\texttt{dep.sqlite}).
+Dans votre terminal, lancez la commande \verb+sqlite3 dep.sqlite+.
+Ceci vous propose une interface pour lancer des requêtes SQL. Sans entrer
+dans les détails du langage SQL, essayez \verb+select * from dep;+.
+Vous obtiendrez une liste de départements français (en métropole) avec 
+leurs noms et chef-lieux. On peut être plus spéficique :
+\verb+select nom,cheflieu from dep where nr='94';+ n'affiche que les
+données pour le Val-de-Marne. Vous remarquerez que \verb+sqlite3+ accepte
+des requêtes sur son entrée standard et affiche les réponses sur sa sortie
+standard.
+
+\subsection{Interfacer avec la base de données}
+
+Utiliser une interface avec une base de données est très utile pour stocker
+et récupérer les données d'un programme. (Par exemple, le serveur
+pédagogique fonctionne de cette manière). L'idée, pour votre programme, est de lancer
+un fils qui exécute un client de base de données (comme \verb+sqlite3+)
+et de communiquer avec celui-ci en utilisant des tubes : un pour envoyer
+des requêtes, l'autre pour récupérer les réponses. Le premier sera connecté
+à l'entrée standard d'un processus sqlite, le deuxième à la sortie standard.
+
+Regardez le programme \verb+departement.c+ et complétez-le. Le programme
+est censé accepter un numéro de département et afficher ses données
+(nom, cheflieu) sur l'écran. À vous d'ajouter les bonnes opérations
+sur les tubes.
+
+\end{document}

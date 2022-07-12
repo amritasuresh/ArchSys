@@ -1,0 +1,1121 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\usepackage{hyperref}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{01}
+% Titre du TP
+\newcommand{\titretd}{La ligne de commande sous Linux}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+\begin{introduction}
+Les deux premiers TP du cours Architecture et Système font à la fois office d'introduction,
+et de révision des connaissances de base du système d'exploitation GNU/Linux que vous utiliserez
+tout au long de votre cursus. Toutes les notions abordées ici seront considérées comme
+acquises et maitrisées pour tous les cours à venir quelque soit le module.
+
+\noindent Ce premier TP vous invite à (re)découvir la ligne de commande (shell).
+
+\noindent Les postes informatiques de la salle 411 fonctionnent sous Xubuntu Xenial 16.04. Il s'agit d'un
+système d'exploitation GNU/Linux (noyau Linux et outils GNU) basé sur la distribution Ubuntu (une <<Debian like>>)
+utilisant l'environnement de bureau (Desktop Environment) Xfce.
+
+\noindent La connexion à votre session vous donne accès à votre environnement de travail. Vous choisirez
+un interpréteur de commandes (Terminal) pour saisir les instructions de ce TP.
+
+\end{introduction}
+
+\section{Ligne de commande : mode interactif}
+
+Dans cette première partie, nous utiliserons la ligne de commande en mode interactif, à chaque commande
+correspond un retour plus ou moins immédiat.
+
+\subsection{Terminologie}
+
+Afin de se comprendre lorsque l'on parle du shell, définissons un certain nombre d'éléments :
+
+\begin{itemize}
+ \item{interpréteur de commande} :\bigskip
+ \item{terminal} : \bigskip
+ \item{commande} :\bigskip
+ \item{shell} :\bigskip
+ \item{prompt} :\bigskip
+ \item{invite de commande} :\bigskip
+ \item{home / homedirectory} :\bigskip
+ \item{root} :\bigskip
+ \item{utilisateur} :\bigskip
+ \item{login} : \bigskip
+ \item{racine} :\bigskip
+ \item{complétion} :\bigskip
+ \item{wildcard} :\bigskip
+\end{itemize}
+
+\begin{solution}
+ Ces définitions sont volontairement simplifiées afin d'être accessible à tous :
+
+ \begin{itemize}
+  \item{interpréteur de commande} : c'est un programme disposant d'un langage propre à qui l'on passe des
+instructions afin qu'elles soient exécutées (ex: sh, zsh, bash, dash) ;
+  \item{terminal} : c'est un programme permettant d'interagir avec l'interpréteur de commande (ex : Xterm, Konsole, Terminator, etc) ;
+  \item{commande} : instruction saisie par l'utilisateur et interprétée par l'interpréteur de commande ;
+  \item{shell} : synonyme d'interpréteur de commande ;
+  \item{prompt} : indication courte et personalisable précédent l'invite de commande dans le terminal ;
+  \item{invite de commande} : l'endroit où l'on saisit les instructions ;
+  \item{home / homedirectory} : répertoire personnel de l'utilisateur contenant tous ses fichiers (documents
+et configurations) ;
+  \item{root} : c'est le compte super administrateur de la machine, il a les droits les plus élevés sur la machine ;
+  \item{utilisateur} : toutes personnes utilisant la machine ;
+  \item{login} : nom que vous utilisez pour vous connecter à votre compte ;
+  \item{racine} : notée "/", est le répertoire de plus haut niveau dans lequel le système d'exploitation est installé ;
+généralement, seul les administrateurs sont autorisés à y écrire ;
+  \item{complétion} : la complétion est l'action consistant à saisir le début d'une commande et de la faire compléter automatiquement par le shell en utilisant la touche <<tabulation>> (<<tab>>) ;
+  \item{wildcard} : joker, caractère spécial, expansé par le shell avant l'execution de la commande.
+ \end{itemize}
+\end{solution}
+
+De manière générale, et en très simplifié, les commandes sont saisies par l'utilisateur dans le terminal où elles sont <<buffurisées>>. L'utilisateur <<valide>> sa commande, ou suite d'instructions, par un retour chariot (touche <<Enter>> ou <<Entrée>>). Le contenu du buffer est alors transmis à l'interpréteur de commande pour exécution.
+
+\subsection{Trouver de l'aide}
+
+Lorsque l'on recherche de l'aide sur l'utilisation d'un programme, le réflexe est d'ouvrir son navigateur internet et de
+lancer une recherche sur son moteur de recherche favori. Cependant, il est parfois plus rapide de consulter la
+documentation locale. Sous Linux, elle est accessible depuis le shell via la commande \textbf{man} (pour manuel).
+
+\subsubsection{Man pages}
+
+Lancez la commande : \textbf{man man} et lisez le document. De quelle commande parlent ces pages ? A quoi sert cette commande ?
+
+\begin{solution}
+ Ces pages fournissent le manuel de man. Cette commande fournit de l'aide sur l'utilisation de commandes.
+\end{solution}
+
+\subsubsection{Utilisation des pages de manuel}
+
+Toutes les pages de \textbf{man} sont organisées de la même manière.
+
+\begin{enumerate}
+ \item{NAME} : nom de la commande ;
+ \item{SYNOPSIS} : résumé court de la syntaxe de la commande ;
+ \item{DESCRIPTION} : description longue ou courte de la commande;
+ \item{OPTIONS} (facultative) : description des options supportées;
+ \item Il existe bien sûr la possibilité de mettre autant de sous-sections que l'on désire;
+ \item{AUTHOR} : les personnes qui ont développé la commande;
+ \item{SEE ALSO} : des références croisées.
+\end{enumerate}
+
+\subsubsection{Manuel de la commande \textbf{ls}}
+
+Vous aller maintenant lire la page d’aide et tenter d'y trouver des informations répondant aux questions suivantes :
+
+\begin{enumerate}
+ \item En 10 mots maximum, à quoi sert cette commande ?
+ \item Quelle option permet d’afficher tous les fichiers (même ceux cachés : ceux dont le nom commence par un point) ?
+ \item Quelle option permet d’afficher les fichiers avec un format long en liste ?
+ \item Quelle option permet d’afficher la taille des fichiers sous une forme facilement lisible par l’homme ?
+ \item Quelle option permet d’afficher récursivement le contenu d'un répertoire ?
+\end{enumerate}
+
+\begin{solution}
+ \begin{enumerate}
+  \item A lister le contenu d'un répertoire
+  \item all : ls -a
+  \item long listing format : ls -l
+  \item human readable : ls -h
+  \item récursive : ls -R
+ \end{enumerate}
+\end{solution}
+
+Utilisez le <<joker>> <<*>> pour lister tous les fichiers commençant par <<u>> à la racine de votre système.
+
+\begin{solution}
+ls -d /u*
+\end{solution}
+
+\subsubsection{La commande \textbf{cd}}
+
+\begin{itemize}
+ \item A quoi sert cette commande ?
+ \item rendez vous dans le répertoire \textbf{tmp} à la racine du système et lister son contenu
+ \item retournez dans votre home directory
+ \item Que fait \textbf{cd -} ?
+\end{itemize}
+
+\begin{solution}
+ \begin{itemize}
+  \item A changer de répertoire
+  \item cd /tmp ; ls
+  \item cd ou cd \textasciitilde{} ou cd /users/dptinfo/$<$login$>$
+  \item retourne dans /tmp et plus généralement retourne dans le répertoire précédent.
+ \end{itemize}
+\end{solution}
+
+\subsubsection{Manuel de la commande \textbf{mkdir}}
+
+Considérons que nous voulons créer à la racine de votre compte le chemin suivant :
+
+\begin{lstlisting}
+ArchiSys/tp/01
+\end{lstlisting}
+
+Lancez la commande suivante et observez ce qui se passe :
+
+\begin{lstlisting}
+cd ; mkdir ArchiSys/tp/01
+\end{lstlisting}
+
+\begin{solution}
+Échec de la création du répertoire car les répertoires parents n'existent pas
+\end{solution}
+
+Cherchez dans la page de man de la commande <<mkdir>>, l’option qui vous permet de créer une hiérarchie de répertoire en une seule commande.
+
+\begin{solution}
+mkdir -p ArchiSys/tp/01
+\end{solution}
+
+\subsection{La commande echo}
+
+À quoi sert la commande <<echo>> ?
+
+\begin{solution}
+Affiche une chaîne de caractère à l'écran en substituant éventuellement des variables et en interprétant des séquences.
+\end{solution}
+
+Que fait la commande suivante ? Pourquoi ?
+
+\begin{lstlisting}[alsoletter={*},emph={*}]
+echo -ne "\n\n *\tHello World $LOGNAME\t\t*\n\n"
+\end{lstlisting}
+
+Essayez la commandes suivantes, quel est la différence ? Pourquoi ?
+
+\begin{lstlisting}[alsoletter={*},emph={*}]
+echo -e '\n\n *\tHello World $LOGNAME\t\t*\n\n'
+\end{lstlisting}
+
+\begin{solution}
+
+Affiche  *      Hello World <login>    *" précédé de 2 lignes vierges et suivi d'une seule car -n supprime le retour chariot lié à écho alors que nous avons fait un retour chariot pour pour valider notre commande.
+
+Seconde commande ne substitue pas la variable login car nous sommes face à des simples quotes. Le texte est centré car nous avons retiré le -n.
+
+Nous reviendrons plus tard sur les variables en shell.
+\end{solution}
+
+\subsection{Autres commandes}
+
+Dans la suite, nous utiliserons la commande <<ps>> qui liste les programmes en cours d'execution sur la machine et <<cat>> qui lit une entrée et la restitue sur la sortie standard. Consultez les pages de manuel de ces commandes si elles ne vous sont pas familières.
+
+\section{Les redirections}
+
+Comme vous l’avez tous remarqué sans y prêter attention, l’exécution d’une commande en ligne de commande peut vous
+afficher des informations à l’écran. Par exemple \textbf{<<ls>>} vous liste le contenu du répertoire courant.
+
+Par défaut, le résultat de l'exécution d'une commande est affiché sur la \textbf{<<sortie standard>>} (aussi appelée \textbf{<<stdout>>}). Il est possible
+de changer ce comportement par défaut pour <<afficher>> dans un fichier plutôt que sur le terminal le résultat d'une
+commande : cette pratique s’appelle la redirection.
+
+Notez également que tout programme possède sa sortie standard, mais ne l’utilise pas forcement.
+
+De manière générale, la plupart des programmes fonctionnent comme suit :
+
+\begin{itemize}
+ \item si un ou plusieurs fichiers sont spécifiés, le programme travaille sur ces fichiers ;
+ \item si aucun fichier n'est spécifié, l'entrée standard est utilisée.
+\end{itemize}
+
+\subsection{Premières redirections}
+
+Exécutez chacune des commandes suivantes (dans l’ordre) dans votre terminal, examinez les résultats et déduisez ce qui ce passe
+(il faudra bien évidemment regarder le contenu des fichiers générés) :
+
+\begin{lstlisting}
+ls
+ls > file1
+pwd > file1
+ps aux > file2.txt
+cd > file3
+cat file1 file2.txt > file4
+cat file1 >> file1
+pwd >> file1
+cat file1 > /dev/null
+\end{lstlisting}
+
+À quoi servent les mots clefs <<$>$>> et <<$>>$>> dans les exemples précédents ?
+
+\begin{solution}
+ \begin{itemize}
+  \item liste le contenu du répertoire courant
+  \item idem et redirige le contenu dans file1 qui est créé s'il n'existe pas et que l'on peut écrire dans le répertoire courant
+  \item écrase le contenu de file1 par le chemin du répertoire courant
+  \item liste les processus et place le résultat dans file2.txt
+  \item rien sur la sortie standard de cd donc crée un fichier vide dans le répertoire d'où est invoqué la commande
+  \item concatène file1 file2.txt dans file4
+  \item affiche une erreur "cat: file1: input file is output file"
+  \item ajoute le chemin du répertoire courant à file1
+  \item envoie stdout dans un trou noir
+ \end{itemize}
+
+ $>$ envoie stdout dans un fichier, tente de le créer s'il n'existe pas, remplace son contenu s'il existe.
+
+ $>>$ envoie stdout dans un fichier, tente de le créer s'il n'existe pas, ajoute les informations à la fin du fichier s'il existe.
+
+\end{solution}
+
+\subsection{Le pipe}
+
+Le pipe est aussi une forme de redirection, mais cette fois au lieu de rediriger la sortie standard
+sur un fichier comme précédemment, nous allons la rediriger vers une commande (pour simplifier, un
+programme). Notez que, comme pour la sortie standard, tout programme possède une \textbf{<<entrée standard>>}, \textbf{<<stdin>>},
+qui peut ou non être utilisée. Dans le terminal, l'entrée standard est souvent le clavier.
+
+\subsubsection{pipe et cat}
+
+Lancez la commande cat dans un terminal.
+Écriver quelques mots à l’écran puis appuyez sur <<Enter>> (ou <<Entrée>> en fonction de votre clavier).
+La ligne est dupliquée. Pourquoi ?
+
+\begin{solution}
+ Car cat prend les informations de son entrée standard (ici le clavier) et les affiche sur sa sortie standard.
+ C’est le comportement normal :
+ \begin{itemize}
+  \item Entrée standard : clavier
+  \item Sortie standard : écran
+ \end{itemize}
+\end{solution}
+
+\subsubsection{Exemples de pipe}
+
+Exécutez chacune des commandes suivantes (dans l’ordre) dans votre terminal, examinez le contenu des fichiers manipulés et en déduire ce qui se passe :
+
+\begin{lstlisting}
+ls -R > file1
+less file1
+cat file1
+cat file1 | less
+ps aux
+ps aux | grep -v root
+ps aux | grep root
+ps aux > file2
+cat file2 | grep -v root
+\end{lstlisting}
+
+Questions complémentaires : à quoi sert grep ? et son option '-v' ?
+
+\begin{solution}
+ \begin{itemize}
+  \item consigne le contenu récursif du répertoire courant dans le fichier file1 ;
+  \item affiche file1 page par page ;
+  \item affiche file1 tout d'un coup ;
+  \item affiche file1 tout d'un coup et utilise un pager pour afficher la sortie ;
+  \item affiche la liste de tous les processus ;
+  \item idem en retirant les lignes contenant 'root' ;
+  \item n'affiche que les processus de 'root' ;
+  \item consigne la liste de tous les processus dans file2 ;
+  \item affiche la liste des processus de file2 sauf ceux de 'root'.
+ \end{itemize}
+\end{solution}
+
+Lister les processus n'appartenant pas à <<root>> mais contenant root dans leurs nom et les consigner dans le fichier 'processwithroot'.
+
+\begin{solution}
+ \begin{verbatim}
+  ps aux | grep -v ^root | grep root > processwithroot
+ \end{verbatim}
+\end{solution}
+
+\subsection{Redirection d'entrées}
+
+Tout comme il est possible de rediriger la sortie d'une commande, il est parfois intéressant de rediriger son entrée. Expliquez le comportement de la commande suivante :
+
+\begin{lstlisting}
+cat <<eob
+a
+b
+c
+eob
+\end{lstlisting}
+
+Quel est la différence entre \textbf{<{}}, \textbf{<{}<{}} et \textbf{<{}<{}<{}} ?
+
+\begin{solution}
+  Nous redirigeons sur l'entrée standard de cat le flux de données jusqu'à ce que nous rencontrions la chaîne de carctère <<eob>>. <<cat>> éffectue ensuite son travail qui consiste à afficher ce qui lui a été passé en argument.
+  \begin{itemize}
+  \item[<] L'argument est un nom de fichier.
+  \item[<{}<{}] L'argument est une chaîne qui indique la fin de saisie
+  \item[<{}<{}<{}] L'argument directement la chaîne à passer en argument
+  \end{itemize}
+\end{solution}
+
+\section{Gestion de processus}
+
+Nous désignons par <<gestion de processus>> la manipulation des programmes en cours d’exécution à partir
+d’un terminal. Il existe bien sur des clients graphiques, comme sous Windows ou Mac OS, qui permettent de
+faire ce que nous allons faire dans cette section en ligne de commande.
+
+Un programme en cours d’exécution s’appelle un \textbf{processus}. Les processus sont identifiés sur le système par un numéro appelé <<PID>> (process identifier).
+
+Sous Unix en ligne de commande, un processus peut être exécuté de deux manières différentes :
+
+\begin{itemize}
+ \item En tâche de fond (background) : lorsque que le processus est lancé en tâche de fond, le terminal
+vous rend la main immédiatement, alors que que le processus continue à s’exécuter : une commande qui
+s’exécute rapidement vous rendra la main immédiatement alors qu’elle n’est pas lancée en tâche de fond ;
+ \item En avant plan (foreground) : le terminal vous rend la main seulement quand le processus
+s’est terminé.
+\end{itemize}
+
+Nous allons voir qu’il est possible de basculer un processus d’un état à un autre dans le terminal, et de tuer
+des processus. Nous verrons aussi qu’il est possible de lister les processus en cours d’exécution dans un
+terminal grâce à la commande \textbf{<<jobs>>}.
+
+\subsection{Processus en tâche de fond}
+
+Le <<et commercial>>, aussi appelé <<esperluette>> en fin de commande permet de lancer un processus en tâche de fond :
+
+\begin{lstlisting}
+xterm &
+emacs monfichier &
+\end{lstlisting}
+
+Dans ce cas, le Shell exécute la commande xterm et rends la main après avoir affiché le PID numéroté par le shell depuis 1, puis il lance de même emacs.
+
+Exemple de retour après xterm :
+
+\begin{lstlisting}
+[1] 1360
+\end{lstlisting}
+
+puis après le emacs :
+
+\begin{lstlisting}
+[2] 1366
+\end{lstlisting}
+
+Dans ce cas, le PID d'xterm est <<1360>> et ce processus est numéroté <<1>> dans le shell tandis que emacs (PID 1366) est numéroté <<2>> dans ce shell.
+
+\subsection{Processus en avant plan}
+
+Lancer les mêmes commandes que précédemment mais sans l'esperluette.
+
+\subsection{Basculement d’un état à un autre}
+
+Lorsqu’un processus est lancé en <<foreground>>, vous ne pouvez plus interagir avec le Shell qui l’a lancé.
+Pour <<reprendre la main>> il faut basculer le processus en <<background>>.
+La séquence de touche \textsc{<<Ctrl + Z>>} met tout d'abord en sommeil le processus en cours d'exécution en avant plan, ensuite la commande <<bg>> (pour <<background>> bien sûr) réveille le processus et l'exécute en tâche de fond.
+
+\textbf{NB :} La touche <<Contrôle>> peut être notée <<\textsc{Ctrl}>> ou <<\^{}>>. Ces notations sont équivalentes.
+
+À l'inverse, le dernier processus lancé en background (avec le <<\&>>), peut être basculé au premier plan avec la commande <<fg>> suivie de <<Enter>> (ou <<Entrée>> en fonction des claviers).
+
+\begin{itemize}
+ \item Dans un terminal lancer un nouveau terminal <<xterm>> ;
+\begin{solution}
+xterm
+\end{solution}
+ \item lancer la commande ls dans le nouveau terminal ;
+\begin{solution}
+ls
+\end{solution}
+ \item mettre le nouveau terminal en sommeil ;
+\begin{solution}
+dans le terminal parent \textsc{Ctrl + Z}
+\end{solution}
+ \item lancer la commande ls dans le nouveau terminal, que se passe-t-il ? Pourquoi ?
+\begin{solution}
+Ça ne marche pas car le terminal est en sommeil.
+\end{solution}
+ \item basculer le terminal en arrière plan
+\begin{solution}
+bg
+\end{solution}
+ \item relancer <<ls>> que se passe-t-il ? Pourquoi ?
+\begin{solution}
+<<ls>> fonctionne car le processus est réveillé mais en arrière plan.
+\end{solution}
+\end{itemize}
+
+\subsubsection{Application sur les états de processus}
+
+Saisir le code suivant dans le fichier "script1" (utiliser cat et une redirection) :
+
+\begin{lstlisting}
+while true ; do
+ for i in {1..5} ; do
+  echo bla
+  sleep 1
+ done
+ echo -n ">> "
+ read a
+ echo $a
+done
+\end{lstlisting}
+
+\begin{solution}
+
+cat > script1
+
+le code
+
+\^{}d
+
+\end{solution}
+
+Lancez la commande suivante <<bash script1>>, lorsque la ligne le terminal affiche <<$>> $ >> saisir un caractère et valider par <<Enter>> ou <<Entrée>>.
+
+Après plusieurs executions, mettre le script en sommeil. Que ce passe-t-il ?
+
+\begin{solution}
+L'execution s'arrête en numérotant le processus arrêté :
+
+[1]+  Stopped                 sh tmp/script1
+\end{solution}
+
+Réveiller le processus en avant plan, que ce passe-t-il ?
+
+\begin{solution}
+L'execution reprend, OÙ elle s'était arrêtée, en rappelant la ligne de commande executée.
+\end{solution}
+
+Basculer le processus en arrière plan. Que ce passe-t-il si vous saississez <<ls>> lors de l'affichage de <<$>> $>> ? Proposez une explication.
+
+\begin{solution}
+
+\^{}z
+
+bg
+
+Les affichages du programme qui s'execute en arrière plan et du shell se mélangent. Il faut reprendre la main sur le processus en arrière plan.
+
+\end{solution}
+
+Re prenez la main sur le processus le script et arrêtez le.
+
+\begin{solution}
+
+fg
+
+\^{}c
+\end{solution}
+
+\subsection{Tuer un processus en foreground}
+
+Pour tuer un processus exécuté en premier plan, saisir la séquence \textsc{<<Ctrl + C>>} dans le terminal exécutant le processus.
+
+\subsection{jobs}
+
+En vous aidant de la page d’aide du bash à la section <<JOB CONTROL>>, exécutez les commandes ou séquences claviers suivantes et analysez le comportement des processus (vous aurez bien
+entendu besoin de deux terminaux, un pour la manpage, l’autre pour l’exercice).
+
+\noindent \textbf{NB :} Pensez à vous repositionner dans le terminal après le lancement des applications.
+
+\begin{lstlisting}
+emacs &
+xterm &
+firefox &
+emacs
+Ctrl + C
+jobs
+fg %3
+Ctrl + Z
+bg
+fg %2
+Ctrl + C
+kill %1
+jobs
+\end{lstlisting}
+
+Quel processus reste-t-il après l’exécution de ces commandes ?
+
+\begin{solution}
+ \begin{enumerate}
+  \item lance emacs en background ;
+  \item lance xterm en background ;
+  \item lance firefox en background ;
+  \item lance une autre instance d'emacs en foreground ;
+  \item tue la dernière occurrence d'emacs lancée ;
+  \item jobs affiche la liste des processus lancés depuis ce terminal en background ;
+  \item bascule le troisième processus en foreground et affiche le nom du programme (firefox) ;
+  \item met firefox en sommeil ;
+  \item le bascule en background ;
+  \item bascule le second processus en avant plan (xterm) ;
+  \item arrête xterm ;
+  \item tue le premier processus lancé (emacs) ;
+  \item affiche la liste de jobs liés à ce shell
+ \end{enumerate}
+
+ Seul Firefox reste actif.
+
+\end{solution}
+
+\subsection{Chaîner des processus}
+
+Lorsqu'un programme termine son exécution, il retourne une valeur liée à la manière dont le processus s'est arrêté. Cette valeur peut être utilisée afin de chaîner des commandes. Pour cela, nous utiliserons les opérateurs <<\&\&>> pour <<ET>> et <<||>> pour <<OU>>.
+
+\subsubsection{Première chaîne de processus}
+
+Avec la commande <<grep>>, testez l'existance du compte <<root>> sur votre système et afficher le message : <<root existe>> si le compte est trouvé.
+
+\textbf{NB :} le fichier <</etc/passwd>> contient la liste des comptes existant sur le système.
+
+\begin{solution}
+grep root /etc/passwd \&\& echo "root existe"
+\end{solution}
+
+\subsubsection{Chaîne plus évoluée}
+
+En utilisant ces opérateurs et ce qui a été vu précedemment, écrire une commande affichant \textbf{UNIQUEMENT} le texte <<Firefox est en cours d'exécution>> sur la sortie standard si le programme firefox est exécuté sur votre machine et <<Pas de firefox actuellement>> sinon.
+
+\begin{solution}
+ps aux | grep -v grep | grep firefox > /dev/null \&\& echo "Firefox est en cours d'exécution" || echo "Pas de firefox actuellement"
+
+Cela fonctionne car la sortie de <<ps>> est figée entre le passage dans le premier grep et le passage dans le second.
+
+\end{solution}
+
+\section{Le système d'exploitation GNU/Linux}
+
+\subsection{Généralités}
+
+\begin{itemize}
+ \item La racine du système d'exploitation Linux est notée "/".
+ \item Sous Linux tout est fichier.
+ \item Un utilisateur est une personne ou un programme enregistré sur le système (disposant d'un compte).
+ \item Des groupes permettent de classer les utilisateurs en fonction de critères définis par l'administrateur du système.
+ \item Les utilisateurs peuvent appartenir à un ou plusieurs groupes.
+ \item Les utilisateurs disposent de privilèges en fonction de leurs groupes d'appartenance.
+ \item Pour le système, un utilisateur est un numéro appelé <<uid>> associé à un <<login>>.
+ \item Pour le système, un groupe est également un numéro.
+ \item L'utilisateur appartient par défaut à un groupe dont le numéro est le <<gid>>.
+ \item Les droits, ou permissions, pouvant être affectés à un fichier sont : aucun droit noté <<->>, <<lecture>> noté <<r>>, <<écriture>> noté <<w>> et exécution ou droit de traverser noté <<x>>.
+ \item Les droits peuvent être octroyés aux utilisateurs, aux groupes ou aux autres (personnes n'appartenant pas aux deux ensembles précédents).
+ \item Les droits sont affichés sous la forme de triplets "rwx" pour chaque ensemble auquel ils peuvent être octroyés (au final nous obtenons des permissions allant de <<$---------$>>, aucun droit, à <<rwxrwxrwx>> tous le monde peut accéder en lecture écriture au fichier).
+ \item L'option <<-l>> de <<ls>> permet de consulter les droits appliqués aux fichiers.
+ \item La commande <<chmod>> (change mode) permet de modifier les droits sur les fichiers.
+ \item La commande <<chown>> (change owner) permet de modifier le propriétaire et/ou le groupe propriétaire d'un fichier.
+ \item Sur un système d'entreprise, un utilisateur simple ne peut élever ses privilèges sans autorisation.
+ \item Le répertoire personnel d'un utilisateur est noté <<\textasciitilde{}login>>. Si <<login>> est omis, l'utilisateur courant est sous-entendu.
+ \item <<groups>> Permet de lister les groupes d'appartenance d'un utilisateur et <<id>> précise leur numéro.
+ \item <<pwd>> Vous localise sur le système (affiche le répertoire courant dans lequel vous vous trouvez).
+\end{itemize}
+
+\subsection{Questions}
+
+\begin{itemize}
+ \item Quels sont les droits sur votre répertoire personnel ?
+\begin{solution}
+
+ls -ld \textasciitilde{}
+
+drwx$--$s$--$x 71 fhh users 28672 Sep 19 18:49 /users/fhh
+
+\end{solution}
+ \item A quel groupe appartient votre <<homedir>> ?
+\begin{solution}
+users
+\end{solution}
+ \item A quels groupe appartenez-vous ? et votre voisin ?
+\begin{solution}
+id
+
+uid=1000(fhh) gid=100(users) groups=100(users),7(lp)
+
+id login\_voisin
+
+...
+
+\end{solution}
+ \item Rendez-vous dans le <<homedir>> de <<fhh>>. Que se passe-t-il ? Pourquoi ?
+\begin{solution}
+
+cd \textasciitilde{}fhh
+
+-su: cd: /import/fhh: Permission denied
+
+Explication :
+
+ls -ld \textasciitilde{}fhh
+
+drwx$--$S$--$x 40 fhh users 4096 Jan  6  2016 /import/fhh
+
+Je n'ai pas le droit d'entrer dans ce répertoire.
+\end{solution}
+ \item Quel est votre gid ?
+\begin{solution}
+100 (associé au groupe <<users>>)
+\end{solution}
+ \item <<chmod>> Dispose d'une notation octale des droits. Donner deux commandes, une avec notation octale, l'autre avec notation alphabétique, permettant de définir les droits suivants sur le répertoire <<mydir>> (droits de départ <<rwxr-xr-x>>) :
+ \begin{itemize}
+  \item rwx$------$
+  \item rwxr-x$---$
+ \end{itemize}
+\begin{solution}
+ \begin{itemize}
+  \item chmod 700 mydir ; chmod go-rx mydir
+  \item chmod 750 mydir ; chmod o-rx mydir
+ \end{itemize}
+\end{solution}
+ \item Changez le propriétaire du répertoire tmp. Que se passe-t-il ? Expliquez.
+\begin{solution}
+Nous ne sommes pas autorisé à changer les droits sur un répertoire qui ne nous appartient pas
+\end{solution}
+\end{itemize}
+
+\section{Les variables}
+Sous Unix, le système est capable d’échanger ou de récupérer des informations par l’utilisation de variables. Ces variables sont rendues accessibles par le Shell. Certaines sont des variables du système d’exploitation (variables d’environnement), d’autres sont propres au Shell.
+Nous allons en étudier quelques unes, comment les modifier, les créer ou les afficher.
+
+\subsection{Déclaration}
+
+La déclaration d'une variable est du type :
+
+\begin{lstlisting}
+nomvar=valeur
+\end{lstlisting}
+
+Où <<valeur>> est une chaîne de caractères, et <<nomvar>> est une chaîne composée des caractères ASCII de base et ne commençant pas par des chiffres. Par exemple :
+
+\begin{lstlisting}
+name="Jean"
+\end{lstlisting}
+
+\subsection{Affichage}
+
+Le bash (qui est un type de Shell) vous fournit la commande <<echo>>. Cette commande vous permet d’afficher la valeur associée au nom d’une variable. Les variables doivent être préfixées
+par le caractère <<\$>>. La commande suivante affiche la valeur associée à la variable denommée <<name>> :
+
+\begin{lstlisting}
+echo $name
+\end{lstlisting}
+
+Bien que cette notation fonctionne, la notation recomandée par bash est :
+
+\begin{lstlisting}
+echo ${name}
+\end{lstlisting}
+
+\subsection{Modification}
+
+Modifier une variable consiste à écraser sa précédente déclaration.
+
+\subsection{Exercices}
+
+\begin{enumerate}
+ \item Affichez le contenu de la variable HOME. A votre avis que représente cette variable ?
+\begin{solution}
+echo \$HOME
+
+Le chemin du répertoire personnel
+\end{solution}
+ \item Affichez le contenu de la variable PWD. A votre avis que représente cette variable ?
+\begin{solution}
+echo \$PWD
+
+Localisation actuelle
+\end{solution}
+ \item Affichez le contenu de la variable PATH. A votre avis que représente cette variable ?
+\begin{solution}
+echo \$PATH
+
+Chemin vers les binaires
+\end{solution}
+ \item Affichez le contenu de la variable PS1. A votre avis que représente cette variable ? Cherchez dans la page d’aide du bash.
+\begin{solution}
+echo \$PS1
+
+Définition du prompt
+\end{solution}
+ \item Modifiez le contenu de la variable PATH, puis essayer de lancer une commande. Que se passe t’il ?
+\begin{solution}
+PATH=/etc
+
+Plus rien ne fonctionne
+\end{solution}
+ \item Modifiez la variable PS1, lancez un nouveau terminal. Que constatez-vous ?
+\begin{solution}
+PS1=a
+
+PS1 n'est pas pris en compte
+\end{solution}
+ \item Modifiez le fichier de configuration du bash pour y inclure votre définition de la variable PS1. Quelles sont les différences de comportement ?
+\begin{solution}
+vi \textasciitilde{}/.bashrc
+
+PS1 est appliqué sur chaque nouveau shell
+\end{solution}
+\end{enumerate}
+
+\subsection{Chaîne de caractères}
+
+Avec le shell vous pourrez trouver des chaînes de caractères entre double quotes (“foo”), simple quote (’foo’) ou anti-quote (`foo`). Testez les commandes suivantes :
+
+\begin{lstlisting}
+echo $HOME
+echo "$HOME"
+echo '$HOME'
+echo `$HOME`
+TEST=ls ; echo "`$TEST`"
+test=$(ls) ; echo $test
+\end{lstlisting}
+
+\begin{solution}
+\begin{itemize}
+ \item affiche localisation du home directory ;
+ \item idem ;
+ \item tente d'exécuter le chemin ;
+ \item met ls dans la variable TEST est affiche le résultat de l'exécution de du contenu de TEST ;
+ \item met le contenu du retour de ls dans test et l'affiche.
+\end{itemize}
+\end{solution}
+
+\section{Installer un programme}
+
+Vous n'êtes pas autorisé à installer des paquets (fichiers permettant de déployer les programmes sous Linux) sur les systèmes de la salle 411, cependant, vous pouvez compiler et installer un programme ou une bibliothèque que vous souhaiteriez utiliser dans votre répertoire personnel. Dans cet exercice, nous allons compiler une version récente d'OpenSSH dans notre <<home>> afin de l'utiliser dans le prochain TP.
+
+\begin{itemize}
+ \item Télécharger les sources d'OpenSSH dans un répertoire src à la racine de votre compte via la commande <<wget>> ;
+\begin{solution}
+
+ mkdir \textasciitilde{}/src \&\& cd \textasciitilde{}/src
+
+ wget http://ftp.fr.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-7.3p1.tar.gz
+\end{solution}
+ \item Extraire les sources à l'aide de la commande <<tar>> ;
+\begin{solution}
+ tar xf openssh-7.3p1.tar.gz
+\end{solution}
+ \item Configurer les sources pour installer le programme dans \textasciitilde{}/Applications
+\begin{solution}
+
+ mkdir \textasciitilde{}/Applications
+
+ cd openssh-7.3p1
+
+ ./configure $--$prefix=\$HOME/Applications
+\end{solution}
+ \item Compilez les sources en utilisant la commande <<make>>
+\begin{solution}
+ make -j8
+\end{solution}
+ \item Installez le programme, que se passe-t-il ? Corrigez si besoin.
+\begin{solution}
+
+make install
+
+...
+
+mkdir: cannot create directory ‘/var/empty’: Permission denied
+
+Le programme tente de créer un répertoire dans /var ce qui est interdit.
+
+La lecture de <<./configure $--$help>> nous apprend que <<$--$with-privsep-path=...>> permet de définir le positionnement du répertoire <<empty>>.
+
+Relançons le configure en ajoutant $--$with-privsep-path=\$PREFIX
+
+make clean
+
+./configure $--$prefix=\$HOME/Applications $--$with-privsep-path=\$HOME/Applications
+
+make -j8
+
+make install
+
+...
+
+make: [check-config] Error 255 (ignored)
+
+Une erreur est signalée pour le changement de droit sur certain fichiers. L'erreur est affichée comme ignorée.
+
+\end{solution}
+ \item Vérifiez la version de SSH et commentez le résultat.
+\begin{solution}
+
+ssh -V
+
+OpenSSH\_6.6.1p1 Ubuntu-2ubuntu2.8, OpenSSL 1.0.1f 6 Jan 2014
+
+Notre version n'est pas utilisée car elle n'est pas dans le chemin de recherche des binaires.
+
+\end{solution}
+
+ \item Ajouter le répertoire \textasciitilde{}/Applications/bin au PATH
+\begin{solution}
+
+PATH=\$HOME/Applications/bin:\$PATH
+\end{solution}
+
+ \item Vérifiez la version de SSH et commentez le résultat.
+\begin{solution}
+
+ssh -V
+
+OpenSSH\_7.3p1, OpenSSL 1.0.1f 6 Jan 2014
+
+Notre version est prise en compte.
+\end{solution}
+ \item Rendrez la modification pérenne
+\begin{solution}
+\begin{lstlisting}
+cat >> ~/.bashrc
+PATH=\$HOME/Applications/bin:\$PATH
+^d
+\end{lstlisting}
+\end{solution}
+\end{itemize}
+
+\section{Les scripts}
+
+Un script est un ensemble d'instructions consignées dans un fichier qui seront exécutées séquentiellement.
+
+\textbf{Dans la suite de ce TP nous utiliserons l'interpréteur de commande bash.}
+
+Tous les blocs d'instruction d'un script peuvent être testés directement dans le shell.
+
+\begin{lstlisting}
+cat > myscript
+cd /tmp
+ls
+cd
+^d
+\end{lstlisting}
+
+Le script est exécuté depuis la ligne de commande :
+
+\begin{lstlisting}
+bash myscript
+\end{lstlisting}
+
+Dans cet exemple nous précisons le shell à utiliser (<<bash>>) et lui passons en argument le fichier contenant les instructions.
+
+Nous pouvons également préciser, directement dans le script, l'interpréteur de commande à utiliser en le spécifiant dans l'entête du fichier
+
+\begin{lstlisting}
+cat > myscript
+#!/usr/bin/bash
+
+cd /tmp
+ls
+cd
+^d
+\end{lstlisting}
+
+Cette première ligne s'appelle le \textbf{<<shebang>>}.
+
+La commande <<whereis>> permet de localiser le shell que vous souhaitez utiliser :
+
+\begin{lstlisting}
+whereis bash
+\end{lstlisting}
+
+le script peut ensuite être invoqué comme n'importe quel programme.
+
+\begin{lstlisting}
+./myscript
+\end{lstlisting}
+
+Là, ça ne fonctionne pas, pourquoi ? Corrigez.
+
+\begin{solution}
+Le script n'a pas les droits d'exécution.
+
+chmod +x myscript
+\end{solution}
+
+\subsection{Structure de contrôle}
+
+<<man test>> donne la liste des tests disponible en bash.
+
+\subsubsection{if .. then ... else}
+
+Syntaxe :
+
+\begin{verbatim}
+if commande(s) ; then
+ commande(s)
+[ elif commande(s) ; then
+ commande(s) ] ...
+[ else commande(s) ]
+fi
+\end{verbatim}
+
+En utilisant un <<if>>, testez l'existence du répertoire <</var/logs>>, puis du répertoire <</var/lOg>> et afficher un commentaire en cas de répertoire trouvé ou non.
+
+\begin{solution}
+\begin{verbatim}
+if [ -d /var/logs ] ; then echo logs trouvé ; \
+ elif [ -d /var/lOg ] ; then echo log trouvé ; \
+ else echo rien de tous ça n\'existe ; \
+fi
+\end{verbatim}
+\end{solution}
+
+\textbf{NB :} Dans le cas de ligne de commande longue, vous pouvez utiliser <<\textbackslash{}>> pour passer à la ligne et continuer votre commande.
+
+Afficher <<Alerte>> si vous avez le droit d'écrire dans <</etc>>.
+
+\begin{solution}
+\begin{lstlisting}
+[ -w /etc ] && echo Alerte
+\end{lstlisting}
+\end{solution}
+
+\subsubsection{for ...  do ... done}
+
+Syntaxe :
+
+\begin{verbatim}
+for var in list ; do
+ commande(s)
+done
+\end{verbatim}
+
+Ecrire un <<for>> qui affiche les lettres <<a b c d>> a raison d'un par ligne.
+
+\begin{solution}
+\begin{verbatim}
+for i in a b c d ;  do echo $i ; done
+\end{verbatim}
+Illustrer les expressions globales et les listes type {1..10}
+\end{solution}
+
+\subsubsection{while ... do ... done}
+
+Syntaxe :
+
+\begin{verbatim}
+while commande(s) ; do
+ commande(s)
+done
+\end{verbatim}
+
+Que fait la séquence suivante ?
+
+\begin{lstlisting}
+ls | while read a ; do echo $a ; done
+\end{lstlisting}
+
+\begin{solution}
+Affiche à raison d'un par ligne les fichiers du répertoire courant.
+\end{solution}
+
+\subsection{Scanner réseau}
+
+Ecrire une boucle testant votre environnement réseau. Vous utiliserez <<ping>> pour tenter d'appeler les 254 machines de votre plage IP et n'afficherez que les adresses IP disponibles (ayant répondu au ping).
+
+\begin{solution}
+\begin{verbatim}
+for i in {1..254} ; do
+ ping -c1 -w1 138.231.81.$i > /dev/null && echo "138.231.81.$i"
+done
+\end{verbatim}
+\end{solution}
+
+\subsection{Script poubelle}
+
+Écrire un petit script qui prend en paramètre un ensemble de fichiers et les déplace dans la poubelle (un répertoire <<.trash>> à la racine de votre répertoire utilisateur).
+Afficher un message d'erreur si un fichier n'existe pas.
+Dans un premier temps trouvez la variable spéciale qui représente tous les paramètres de la ligne de commande (voir man bash).
+Réalisez le petit script (10 à 15 loc).
+
+\begin{solution}
+\begin{verbatim}
+#!/bin/bash
+
+[ -d ~/.trash ] || mkdir ~/.trash
+for i in $* ; do
+ if [ -e "$i" ] ; then
+  mv "$i"  ~/.trash
+ else
+  echo "$i not found"
+ fi
+done
+\end{verbatim}
+\end{solution}
+
+\section{Quelques raccourcis bien pratiques}
+
+Si vous utiliser l'éditeur de texte \textbf{emacs} (Ô joie !), vous aurez la chance de pouvoir réutiliser certains raccourcis clavier lors de la saisie d'une commande\footnote{Si vous êtes utilisateur de \textbf{vi}, il faut changer le mode d'édition : \url{https://sanctum.geek.nz/arabesque/vi-mode-in-bash/}}.
+\begin{itemize}
+\item Que fais \textbf{Ctrl+R} ?
+\item Que fais \textbf{Ctrl+A} ?
+\item Que fais \textbf{Ctrl+E} ?
+\item Comment copier/coller du texte vers ou depuis votre terminal ?
+\end{itemize}
+
+Si vous utilisez la commande \textbf{man} cependant, les raccourcis changent et utilisent plutôt ceux de \textbf{vi}: Pour rechercher du texte, il faut utiliser la commande \textbf{/} puis les touches \textbf{n} et \textbf{p} pour naviguer entre les différentes occurences par exemple.
+
+\section{Tester vos connaissances}
+
+Pour aller plus loin avec la ligne de commande, je vous recommande d'aller voir l'URL suivante : \url{http://overthewire.org/wargames/bandit/}. Votre but est d'aller jusqu'au niveau 34 ! Il faut réussir le niveau \(n\) pour débloquer le niveau \(n+1\). Bonne chance !
+
+\section{Questions bonus}
+
+\begin{itemize}
+\item Que fait la commande \textbf{which} ?
+  \begin{solution}
+    Elle indique où se situe les programmes passés en paramètre
+  \end{solution}
+\item Quelle est la différence entre les redirections \textbf{>} et \textbf{2>} ?
+  \begin{solution}
+    La première redirige la sortie \textit{standard} tandis que la deuxième redirige la sortie d'\textit{erreur}
+  \end{solution}
+\item Comment mélanger ces deux redirections ?
+  \begin{solution}
+    Il faut écrire \textbf{2> \&1}.
+  \end{solution}
+\item Quel résultat produit la commande \textbf{[} ? la commande \textbf{]} ? Comment l'expliquez-vous ?
+  \begin{solution}
+    Le premier est un programme tandis que le second est utilisé comme paramètre du premier, on peut le vérifier avec la commande suivante : \textbf{[ ]}
+  \end{solution}
+\item Que fait la commande \textbf{pkill} ?
+  \begin{solution}
+    Elle tue un processus via son nom.
+  \end{solution}
+\item Que fait la commande \textbf{less} ? la commande \textbf{more} ? Et oui, les informaticiens avaient le sens de l'humour dans les années \(90\)...
+\item Que fait le commande \textbf{yes} ? À votre avis à quoi peut-elle servir ?
+\item Chercher sur internet une réponse qui explique pourquoi les noms des fichiers cachés commencent par un point.
+\item Faites des recherches sur \textbf{zsh}.
+\end{itemize}
+
+
+\section{Gallerie photo}
+
+L'objectif de cette partie est de créer un script générant une gallerie photo html.
+
+Dans un répertoire se trouve des photos aux formats PNG et JPG. Ce répertoire peut contenir des sous répertoires, correspondant aux collections de photos.
+
+Nous souhaitons un script bash prenant en argument le répertoire contenant les photos et générant une page html contenant la liste des collections et une icône associée, puis une icône de chaque image classée par date de prise de la photo. Losque l'on clique sur une icone de photo, la photo apparaît en 1024x768 (en conservant le ratio longeur largeur). Les images sont pivotées en fonction de la prise de vue. Dans le répertoire contenant les photos, ou les collections, un fichier "comment.txt" permet de définir des commentaires au format "nom\_photo~:~Commentaire sur la photo" qui sera affiché sous la photo lors de l'affichage plein écran.
+
+Toutes les évolutions imaginées sont les bienvenues.
+
+Pour extraire la position des photos et les dates de prises de vues, vous utilisez le programme <<exiv2>>.
+
+Les icônes des images appelées <<thumbnail>> seront générées via la commande <<convert>>. Les icônes déjà générées ne seront pas regénérées (utilisez le md5sum des fichiers comme nom d'icône par exemple).
+
+\begin{solution}
+\begin{itemize}
+ \item téléchargement de exiv2 http://www.exiv2.org/download.html
+ \item extraire les sources
+ \item créer le répertoire de vos applications <<mkdir \textasciitilde{}/Applications>>
+ \item configurer exiv2 depuis le répertoire des sources : ./configure $--$prefix=\$HOME/Application
+ \item compilez le programme : make
+ \item installer le programme dans votre répertoire : make install
+ \item adaptez le PATH en cas de besoin : PATH=\$PATH:\$HOME/Applications/bin/
+ \item testez la commande : exiv2
+ \item création d'une image thumbnail : convert file1 -thumbnail 200x200 f.md5sum.jpg
+\end{itemize}
+\end{solution}
+
+
+\end{document}

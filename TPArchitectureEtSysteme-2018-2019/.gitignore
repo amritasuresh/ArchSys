@@ -1,0 +1,13 @@
+*.aux
+*.log
+*.tmp
+*.pdf
+*.fdb_latexmk
+*.swp
+*.out
+*.ml
+*~
+_build/
+*.native
+\#*
+*.s

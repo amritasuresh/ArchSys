@@ -1,0 +1,91 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{07}
+% Titre du TP
+\newcommand{\titretd}{Petit hack entre amis}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+\begin{introduction}
+Ce TP revient sur les principes du linkage en C.
+\end{introduction}
+
+\section*{Édition de liens : linking}
+
+On considère le fragment suivant d'un programme de C :
+\begin{quote}
+\texttt{x=y+z;}\\
+\verb+printf("x=%d\n",x);+
+\end{quote}
+
+En analysant le code assembleur produit par le compilateur on trouve
+que la première instruction va directement être réalisée par
+des opérations sur les registres et la mémoire tandis que la deuxième
+fait appel à une fonction externe.
+
+\texttt{printf} est en effet réalisée par une fonction fournie par une
+\emph{bibliothèque partagée}. Le modèle de compilation préféré
+de Linux/Unix et d'autres systèmes est de stocker les programmes exécutables
+dans les fichiers sous une forme incomplète, tout en spécifiant quelles
+fonctions partagées seront nécéssaires à son exécution. Lors de
+l'exécution, le programme sera chargé dans la mémoire, puis un
+\emph{éditeur de liens} établit les connexions entre le programme
+et les bibliothèques partagées : le <<\emph{linking}>> en anglais.
+
+Normalement, le système sait où trouver les bonnes librairies.
+Le comportement de l'éditeur de liens peut être modifié par deux
+variables :
+\begin{itemize}
+\item La variable \texttt{LD\_LIBRARY\_PATH} (qui peut être modifié
+  sur la ligne de commande) donne une liste de répertoires où l'éditeur
+  de liens pourra trouver des bibliothèques.
+\item La variable \texttt{LD\_PRELOAD} définit quelques librairies dont
+  l'utilisation sera prioritaire.
+\end{itemize}
+
+Dans cet exercise nous explorerons surtout des applications de l'utilisation de
+\texttt{LD\_PRELOAD}.
+
+\begin{enumerate}
+\item On considère le programme \texttt{password1} (disponible sous forme
+  binaire) qui demande un mot de passe. Trouvez le bon mot de passe.
+\item Faites de même pour \texttt{password2}.
+\item Comment éviter les failles de sécurité présentes dans ces
+  deux programmes ?
+\item Le programme \texttt{game} vous demande une numéro entre 1 et 100
+  choisi aléatoirement lors de chaque exécution. Comment tricher pour
+  gagner toujours au premier tour ?
+\end{enumerate}
+
+\begin{solution}
+\begin{verbatim}
+src
+- game.c Source du jeux
+- leone.c Illustration surcharge puts-hijack
+- password1 Binaire simple plaintext
+- password2 Linké attaque sur strcmp
+- puts-hijack.c Bib hack pour leone
+
+
+$ gcc -fPIC -c strcmp-hijack.c -o hack.o
+$ gcc -shared hack.o -o hack.so
+$ LD_PRELOAD=./hack.so ./password2 toto
+\end{verbatim}
+\end{solution}
+
+
+\end{document}

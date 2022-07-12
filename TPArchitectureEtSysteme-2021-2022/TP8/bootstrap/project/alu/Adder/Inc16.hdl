@@ -1,0 +1,16 @@
+
+/**
+ * 16-bit incrementer:
+ * out = in + 1 (arithmetic addition)
+ */
+
+CHIP Inc16 {
+    IN in[16];
+    OUT out[16];
+
+    PARTS:
+   // Put you code here:
+   Add16(a=in, b[1..15]=false, b[0]=true, out=out);
+   //Note that in order to get 0x1, we set all bits to 0, and the lowest bit to 1.
+   //Note the syntax for selecting a subset of bits [a..b]
+}

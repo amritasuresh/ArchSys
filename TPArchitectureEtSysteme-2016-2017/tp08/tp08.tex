@@ -1,0 +1,87 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{08}
+% Titre du TP
+\newcommand{\titretd}{Le noyau Linux}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+\begin{introduction}
+L'objectif de cette séance est que vous preniez la mesure de l'immensité du noyau Linux. Pour ce faire, vous compilerez au moins deux noyaux, l'un proche du noyau générique de votre distribution, l'autre, complètement adapté à votre système.
+
+Le PDF <<\url{ftp://ftp.oreilly.com/pub/poster/oreilly_linux_poster.pdf}>> représente la place du noyau dans le système GNU/Linux.
+
+La vidéo <<\url{https://www.youtube.com/watch?v=P_02QGsHzEQ}>> vous donne une idée de l'évolution du développement du noyau.
+\end{introduction}
+
+\section{Mise à jour de noyau}
+
+Votre système utilise un noyau générique destiné à supporter un maximum de matériel. Sous GNU/Linux vous trouverez la configuration actuelle de votre noyau dans le fichier <</proc/config.gz>> ou dans <</boot/config-\textit{version du noyau-achi}>>.
+
+Vous téléchargerez les sources du noyau depuis le site officiel : <<\url{https://www.kernel.org}>>.
+
+Installez dans votre machine virtuelle un compilateur <<gcc>>, la commande <<make>>, <<wget>> et <<libncurses-dev>>.
+
+Extraire les sources et copiez la config actuelle dans le répertoire du noyau sous le nom <<.config>>.
+
+Lancez la commande <<make oldconfig>> pour adapter la configuration de votre ancien noyau au sources actuelles.
+
+Compilez le noyau, au besoin, ajoutez les dépendances nécessaires.
+
+Compilez les modules via make modules.
+
+Installez les modules (<<make modules\_install>>) et le noyau (<<make install>>).
+
+Ré générez l'initrd.
+
+Reconfigurez GRUB.
+
+\begin{solution}
+\begin{lstlisting}
+# apt-get install gcc make wget ca-certificates xz-utils libncurses-dev
+# wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.8.10.tar.xz
+# tar xvf linux-4.8.10.tar.xz
+# cd linux-4.8.10
+# cp /boot/config-3.16.0-4-amd64 ./.config
+# make oldconfig
+# make -j2
+# apt-get install bc
+# make modules
+# make modules_install
+# make install
+# mkinitramfs -ko initrd.img-4.8.10 4.8.10
+# update-grub
+\end{lstlisting}
+\end{solution}
+
+\section{Un noyau personnalisé}
+
+La commande <<lspci>>, ainsi que la consultation des logs (<<dmesg>>), vous permet de lister le matériel utilisé sur votre machine.
+
+<<make menuconfig>> vous donne accès au menu de configuration de votre noyau.
+
+En reprenant les sources de l'exercice précédent, <<allégez>> votre noyau en supprimant des composant qui vous semblent inutiles et testez le nouveau kernel.
+
+Vous pourrez vous baser sur la cartographie du système Linux pour choisir des éléments à supprimer <<\url{http://www.makelinux.com/kernel_map/}>>.
+
+\section{Un noyau monolithique}
+
+Un noyau monolithique est un noyau ne chargeant aucun module. Minimisez votre kernel pour le rendre monolithique et testez le.
+
+\textbf{Conseil :} Partez d'un noyau vierge en nettoyant les sources précédentes par <<make mrproper>>.
+
+\end{document}

@@ -1,0 +1,20 @@
+Some helper scripts used to (partially) generate the data in uni.h.
+
+characters.csv is a condensed version of the UnicodeData.txt file, with
+only the characters having interesting normalization properties. All others
+have Combining Class 0, have no decomposition, and are not excluded from
+composition.
+
+high.csv are simply the ids from characters.csv without the lower 8 bits
+(and unique).
+
+primary.csv is another derivation from characters.csv containing the
+Primary Composites and their decompositions. (I.e., characters having
+a (non-compatiblity) decomposition and not being a Full Composition
+Exclusion (fce=0).
+
+plane4.pl partially generates the trie for character lookup and UTF-16
+encoding of the decompositions.
+
+primary.pl generates a perfect (but not minimal) hash function for
+Primary Composites.

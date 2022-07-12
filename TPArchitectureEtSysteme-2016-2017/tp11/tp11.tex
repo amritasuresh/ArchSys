@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{11}
+% Titre du TP
+\newcommand{\titretd}{Élection d'un leader}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+Page web du cours :                                                                                                                                                                                                                                            
+\begin{center}
+\url{http://www.lsv.fr/~schwoon/enseignement/systemes/ws1617/}.
+\end{center}
+
+Sources du TP disponibles dans le répertoire
+<<\textasciitilde{}fhh/share/tp/tp11>> du département informatique.
+
+Un problème important dans la programmation concurrente est de choisir un
+\emph{leader}, p.ex.\ pour l'organisation et la coordination d'un réseau. On
+part avec un nombre $n$ d'ordinateurs ou de processus (on parlera des
+\emph{nœuds}) à priori identiques, à l'exception d'un identifiant unique. En
+suivant un même protocole, tous les nœuds vont s'accorder sur le choix d'un
+leader.
+
+Il existe une grande variété de protocoles menant à ce résultat.  Nous allons
+dans ce TP en étudier et en réaliser un : le protocole Dolev, Klawe, and Rodeh
+qui se distingue par le faible nombre de messages échangé pour l'élection :
+$\mathcal{O}(n\log n)$. Par comparaison, les approches simples ont tendance à
+utiliser $\mathcal{O}(n^2)$ messages.  Le protocole à été presenté en cours et
+les diapos explicatives sont aussi disponibles dans le répertoire du TD.
+
+Le protocole part du principe que les nœuds sont organiseés en anneau, chaque
+nœud envoie des messages à son voisin de droite.  Le répertoire du TP contient
+squelette qui créera $n$ processus (les nœuds) pour $n$ donné ; ces processus
+seront déjà équipés de pipes pour communiquer. Votre tâche est de compléter le
+programme en réalisant le protocole :
+
+\begin{itemize}
+\item Au départ, tous les nœuds sont \emph{actifs} et possèdent un identifiant
+unique.
+
+\item Un nœud actif attend une petite période aléatoire (fonction
+\texttt{delay()}), puis envoie son identifiant à son voisin de droite. Ensuite,
+il attend les identifiants de ses \emph{deux} plus proches voisins actifs à sa
+gauche.  Il décidera ensuite s'il reste actif, devient passif, ou se déclare
+leader. Les conditions seront précisées dans la présentation. S'il reste
+actif, il répète le comportement présenté ci-dessus.
+
+\item Un nœud \emph{passif} transmet simplement tous les messages reçus de
+gauche vers son voisin de droite. En plus, si le message déclare un leader, il
+affiche un message correspondant à l'écran.
+
+\item Il y a trois types de messages échangés par les nœuds, tous dans le
+format (\emph{type},\emph{identifiant}).
+
+\begin{itemize}
+  \item ``voisin'' (v): pour envoyer son identifiant vers le voisin de droite.
+  \item ``prochain'' (p): un nœud qui a reçu l'identifiant de son voisin de
+gauche l'envoie vers son voisin de droite.
+  \item ``gagnant'' (g): un nœud se déclare leader.
+\end{itemize}
+\end{itemize}
+
+\begin{enumerate}
+ \item Complétez la fonction <<protocole>> du fichier <<ring-pipe.c>> qui
+implémente le protocole sus décrit. 
+ \begin{solution}
+ ring-pipe crée plusieurs processus reliés par des pipes.
+ \end{solution}
+ \item Testez votre code avec plusieurs valeurs de $n$. Observez si votre
+programme termine toujours et s'il y a toujours un seul leader.
+ \begin{solution}
+ Au besoin réduire la valeur de DELAY pour $n$ grand.
+ \end{solution}
+ \item La version réseau du programme, <<ring-net.c>> instancie un seul
+n\oe{}ud par exécution. Vous pouvez recopier votre fonction <<protocole>>
+depuis <<ring-pipe.c>>. Le programme prend 3 arguments : le port d'écoute du
+n\oe{}ud, le nom du nœud voisin (nom de machine), le port de connexion au nœud
+voisin. Le programme crée un serveur dans un thread et attend la connexion d'un
+voisin. En parallèle, dans un autre thread, il tente une connexion sur son
+voisin (nom de machine et port passés en argument). Écrivez un script mettant
+en œuvre l'exécution de votre code sur 5 machines du département. Commencez par
+tester l'exécution de votre code localement (machine localhost en utilisant
+différents ports). Étendre progressivement la taille de l'anneau.
+ \item Créez un anneau avec vos voisins et l'étendre à toute la salle de TP.
+\end{enumerate}
+
+\end{document}

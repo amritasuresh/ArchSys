@@ -1,0 +1,395 @@
+\RequirePackage{epsf}
+\RequirePackage{graphicx}
+\RequirePackage{color}
+\RequirePackage{times}
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{latexsym}
+\RequirePackage{wasysym}
+\RequirePackage{alltt}
+%\RequirePackage{ulem}
+
+
+\textwidth 25 cm
+\textheight 17.5 cm
+
+
+\oddsidemargin 15mm
+\evensidemargin -3mm
+%\topmargin-2cm
+
+\unitlength 1mm
+\renewcommand{\arraystretch}{1.4}
+
+%PDF-LaTeX
+\@ifundefined{pdfvorigin}{}{
+  \pdfpagewidth=29.7truecm
+  \pdfpageheight=21truecm
+  \pdfvorigin=0pt
+  \pdfhorigin 0pt
+}
+
+\def\v#1{\textit{#1}}
+\def\n#1{\textrm{#1}}
+\newcommand{\tc}[2]{\textcolor{#1}{#2}}
+%\newcommand{\deq}{\ensuremath{\stackrel{\triangle}{=}}}
+\newcommand{\deq}{\ensuremath{=_{\text{def}}}}
+
+\renewcommand{\AA}{\mathcal{A}}
+\newcommand{\BB}{\mathcal{B}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\FF}{\mathcal{F}}
+\newcommand{\GG}{\mathcal{G}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\PP}{\mathcal{P}}
+\newcommand{\TT}{\mathcal{K}}
+\newcommand{\VV}{\mathcal{V}}
+\newcommand{\WW}{\mathcal{W}}
+\newcommand{\XX}{\mathcal{X}}
+
+\renewcommand{\O}[1]{\overline{#1}}
+\newcommand{\E}{\exists}
+\newcommand{\A}{\forall}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Use font with larger arrowheads.
+\thicklines
+\font\twtyln = line16
+\let\@linefnt\twtyln
+
+\newcommand{\nat}{\mathbb{N}}
+\newcommand{\stutteq}{\simeq}
+\newcommand{\sem}[1]{[\![ #1 ]\!]}
+\newcommand{\seq}[1]{\langle #1\rangle}
+\newcommand{\suffix}[2]{#1|_{#2}}
+\newcommand{\TRUE}{\textrm{\upshape tt}}
+\newcommand{\FALSE}{\textrm{\upshape ff}}
+\newcommand{\false}{\textbf{\upshape false}}
+\newcommand{\true}{\textbf{\upshape true}}
+\renewcommand{\implies}{\Rightarrow}
+\newcommand{\nequiv}{\not\equiv}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Removed by Javier 30.4.2001
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newcommand{\alw}{\Box}
+%\newcommand{\eve}{\Diamond}
+%\newcommand{\nex}{\mbox{\unitlength .5ex\begin{picture}(2.5,2) %\put(1.25,1.2){\circle{2}} \end{picture}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Added by Javier 30.4.2001
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newcommand{\alw}{\mathop{\mathbf{G}}}
+%\newcommand{\eve}{\mathop{\mathbf{F}}}
+%\newcommand{\nex}{\mathop{\mathbf{X}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Modified by Stephan to better align baseline
+\newcommand{\alw}{\mathop{\raisebox{0.5pt}{$\mathbf{G}$}}}
+\newcommand{\eve}{\mathop{\raisebox{0.5pt}{$\mathbf{F}$}}}
+\newcommand{\nex}{\mathop{\raisebox{0.5pt}{$\mathbf{X}$}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\sq}[2]{[#1]_{#2}}
+\newcommand{\an}[2]{\langle #1\rangle_{#2}}
+\newcommand{\until}{\mathrel{\textbf{\upshape until}}}
+\newcommand{\atnext}{\mathrel{\textbf{\upshape atnext}}}
+\newcommand{\proves}{\vdash}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Additions by Javier
+\newcommand{\MM}{\mathcal{M}}
+\newcommand{\kommentar}[1]{\tc{brown}{\sffamily\itshape\tiny #1}}
+\renewcommand{\sem}[1]{\ensuremath{[\![ #1 ]\!]}}
+\newcommand{\trans}[1]{\mathrel{\stackrel{#1}{\longrightarrow}}}
+\newcommand{\Trans}[1]{\mathrel{\stackrel{#1}{\Longrightarrow}}}
+\newcommand{\indep}{\asymp}
+\newcommand{\X}{\mathop{\mathbf{X}}}
+\newcommand{\F}{\mathop{\mathbf{F}}}
+\newcommand{\G}{\mathop{\mathbf{G}}}
+\newcommand{\U}{\mathrel{\mathbf{U}}}
+\newcommand{\W}{\mathrel{\mathbf{W}}}
+\newcommand{\EX}{\mathop{\mathbf{EX}}}
+\newcommand{\AX}{\mathop{\mathbf{AX}}}
+\newcommand{\EF}{\mathop{\mathbf{EF}}}
+\newcommand{\AF}{\mathop{\mathbf{AF}}}
+\newcommand{\EG}{\mathop{\mathbf{EG}}}
+\newcommand{\AG}{\mathop{\mathbf{AG}}}
+\newcommand{\EU}{\mathrel{\mathbf{EU}}}
+\newcommand{\AU}{\mathrel{\mathbf{AU}}}
+\newcommand{\EW}{\mathrel{\mathbf{EW}}}
+\newcommand{\AW}{\mathrel{\mathbf{AW}}}
+\newcommand{\EXF}{\mathop{\mathbf{EX}_{\text{f}}}}
+\newcommand{\AXF}{\mathop{\mathbf{AX}_{\text{f}}}}
+\newcommand{\EFF}{\mathop{\mathbf{EF}_{\text{f}}}}
+\newcommand{\AFF}{\mathop{\mathbf{AF}_{\text{f}}}}
+\newcommand{\EGF}{\mathop{\mathbf{EG}_{\text{f}}}}
+\newcommand{\AGF}{\mathop{\mathbf{AG}_{\text{f}}}}
+\newcommand{\EUF}{\mathrel{\mathbf{EU}_{\text{f}}}}
+\newcommand{\AUF}{\mathrel{\mathbf{AU}_{\text{f}}}}
+\newcommand{\EWF}{\mathrel{\mathbf{EW}_{\text{f}}}}
+\newcommand{\AWF}{\mathrel{\mathbf{AW}_{\text{f}}}}
+\renewcommand{\citation}[3]{\tc{dkgreen}{#1: {\it  #2}. #3}}
+\newcommand{\goes}[1]{\stackrel{#1}{\longrightarrow}}
+\newcommand{\lgoes}[1]{\stackrel{#1}{\longrightarrow}}
+\newcommand{\llgoes}[1]{\stackrel{#1}{-\!\!\!-\!\!\!-\!\!\!\!\longrightarrow}}
+
+\newcommand{\bcdot}{{\LARGE \cdot}}
+\newcommand{\Nat}{{\rm I\hskip-0.21em N}}
+
+%\renewcommand{\vec}[1]{\mathbf{#1}}
+\def\$#1${$#1$}
+\renewcommand{\u}{{\bf u}}
+\renewcommand{\c}{{\bf c}}
+\renewcommand{\l}{{\bf l}}
+\renewcommand{\d}{{\bf d}}
+
+\renewcommand{\n}{{\bf n}}
+\newcommand{\e}{{\bf e}}
+\newcommand{\s}{{\bf s}}
+\newcommand{\p}{{\bf p}}
+\newcommand{\sos}[3]{#1\stackrel{#2}{\longrightarrow}#3}
+
+\newcommand{\LDV}{{\mathrm{DV}}}
+\newcommand{\LWA}{{\mathrm{WA}}}
+\newcommand{\LC}{{\mathrm{L}}}
+
+
+%%%%%%%%%%%Added by Javier%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\post}{{\it post}}
+\newcommand{\pre}{{\it pre}}
+\newcommand{\symaddpre}{{\mathrm Add\_pre}}
+\newcommand{\entail}{{\it Entail}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Additions by Stephan
+\newcommand{\AT}[1]{{\bf at}\ #1}
+\newcommand{\Suc}[1]{\ensuremath{#1\textrm{+}1}}
+\newenvironment{tablist}{\par\ \small\begin{tabular}{@{--\ \ }ll}}{\end{tabular}}
+\newenvironment{CODE}{\begin{alltt}\def\{{\char123}\def\}{\char125}}{\end{alltt}}
+\newcommand{\st}{\ensuremath{\ \ \mid\ \ }}
+\newenvironment{noj}{\begin{array}[t]{@{}l@{}}}{\end{array}}
+%\newcommand{\comment}[1]{\tc{brown}{\textsl{\sffamily #1}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\ENABLED}{\textrm{\upshape ENABLED\ }}
+\newcommand{\WF}{\textrm{\upshape WF}}
+\newcommand{\SF}{\textrm{\upshape SF}}
+\newcommand{\EE}{\makebox{$\raisebox{.05em}{\makebox
+   [0pt][l]{$\exists\hspace*{-.517em}\exists\hspace*{-.517em}\exists$}}\exists\hspace*{-.517em}\exists
+            \hspace*{-.517em}\exists\,$}}
+\newcommand{\whilep}{\mathrel{\stackrel{\scriptscriptstyle +}{\rightarrow}}}
+
+\newcommand{\Smile}{\tc{green}{\smiley}}
+\newcommand{\Frown}{\tc{red}{\frownie}}
+
+\renewcommand{\o}{\vfill\item[]}   %\item[$\bullet$]
+\newenvironment{page*}[1]{\slide\flushleft{\Large\textcolor{blue}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Bologna option
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+{#1\vskip 3mm\color{blue}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Default option
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%{#1\vskip 3mm\color{lightyellow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\raisebox{3cm}[0pt][0pt]{\rule{\textwidth}{1mm}}}%
+    \vspace{-3.5cm}\vfill}}{\vfill\vfill\endslide}
+\newenvironment{page}[1]{\begin{page*}{#1}\begin{list}{}{\itemsep-4mm}}%
+{\end{list}\end{page*}}
+\newenvironment{enum}[1]{\begin{page*}{#1}\begin{list}{}{\leftmargin 0pt\itemsep-1mm}}%
+{\end{list}\end{page*}}
+\newenvironment{pageover*}[1]{\overlay\flushleft{\Large\textcolor{blue}{#1\vskip 3mm%
+\color{white}\raisebox{3cm}[0pt][0pt]{\rule{\textwidth}{1mm}}}%
+    \vspace{-3.5cm}\vfill}}{\vfill\vfill\endoverlay}
+\newenvironment{pageover}[1]{\begin{pageover*}{#1}\begin{list}{}{\itemsep-4mm}}%
+{\end{list}\end{pageover*}}
+\newenvironment{enumover}[1]{\begin{pageover*}{#1}\begin{list}{}{\leftmargin 0pt\itemsep-1mm}}%
+{\end{list}\end{pageover*}}
+\newenvironment{enum1}{\begin{small}\begin{list}{}{\itemsep 0mm}}{\end{list}\end{small}}
+\newenvironment{enum2}{\begin{small}\begin{list}{--}{\itemsep 0mm}}{\end{list}\end{small}}
+\newenvironment{enumla1}{\begin{list}{\itemsep 0mm}}{\end{list}}
+\newenvironment{enumla2}{\begin{list}{--}{\itemsep 0mm}}{\end{list}}
+
+%********* Added by Javier on 19.4.01 ************
+%
+% I define a new environment menum. It's like enum, but with the title 
+% in magenta
+%
+%*************************************************
+\newenvironment{mpage*}[1]{\slide\flushleft{\Large\textcolor{magenta}{#1\vskip 3mm\color{magenta}\raisebox{3cm}[0pt][0pt]{\rule{\textwidth}{1mm}}}%
+    \vspace{-3.5cm}\vfill}}{\vfill\vfill\endslide}
+\newenvironment{menum}[1]{\begin{mpage*}{#1}\begin{list}{}{\leftmargin 0pt\itemsep-1mm}}%
+{\end{list}\end{mpage*}}
+%*************************************************
+
+
+\definecolor{dkblue}{rgb}{0,0,.4}
+\definecolor{soft}{rgb}{.25,.25,.25}
+\definecolor{softblue}{rgb}{.6,.6,.9}
+\definecolor{brown}{rgb}{.7,.3,0}
+\definecolor{yellow}{rgb}{1,.5,0}
+\definecolor{lightyellow}{rgb}{.95,.95,0}
+\definecolor{magenta}{rgb}{.8,0,.4}
+\definecolor{cyan}{rgb}{0,.6,.6}
+\definecolor{dkgreen}{rgb}{0,0.2,0}
+\definecolor{gray}{rgb}{0.7,0.7,0.7}
+
+%********* Added by Javier on 21.8.01 ************
+%
+% I define a new environment pushenum. It's like enum, but with the title 
+% in push
+%
+%*************************************************
+\newenvironment{pushpage*}[1]{\slide\flushleft{\Large\textcolor{push}{#1\vskip 3mm\color{push}\raisebox{3cm}[0pt][0pt]{\rule{\textwidth}{1mm}}}%
+    \vspace{-3.5cm}\vfill}}{\vfill\vfill\endslide}
+\newenvironment{pushenum}[1]{\begin{pushpage*}{#1}\begin{list}{}{\leftmargin 0pt\itemsep-1mm}}%
+{\end{list}\end{pushpage*}}
+%*************************************************
+\definecolor{push}{rgb}{0,0.2,0}
+
+\newcommand{\tup}[1]{{\langle #1\rangle}}
+\newcommand{\Ga}{\Gamma}
+
+
+\def\by#1{\mathop{{\hbox{\setbox0=\hbox{$\scriptstyle{#1\qquad}$}{$\buildrel{\quad\textstyle{#1}\quad}\over{\hbox to \wd0{\rightarrowfill}}$}}}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \noTeXmath
+% \TeXmath   
+%    The \noTeXmath causes TeX to use ordinary italic instead of math
+%    italic in math mode.  The \TeXmath command reverts to TeX's normal
+%    behavior.  (Modified 10 Aug to work with arbitrary \itfam.)
+%    
+
+\newcounter{abr@ctr}
+\newcommand{\abr@c}{\c@abr@ctr\advance\c@abr@ctr\@ne}
+
+% Let it work with LaTeX2e's native mode:
+% D. Roegel, 29/8/1994
+\ifx\documentclass\undefined
+\else
+%%  \DeclareSymbolFont{tlaitalics}{\encodingdefault}{cmr}{m}{it}
+  \DeclareSymbolFont{tlaitalics}{\encodingdefault}{phv}{m}{it}
+  \let\itfam\symtlaitalics
+\fi
+
+\newcommand{\noTeXmath}{%
+\c@abr@ctr=\itfam
+\multiply\c@abr@ctr"100\relax
+\advance\c@abr@ctr "7061\relax
+\mathcode`a=\abr@c
+\mathcode`b=\abr@c
+\mathcode`c=\abr@c
+\mathcode`d=\abr@c
+\mathcode`e=\abr@c
+\mathcode`f=\abr@c
+\mathcode`g=\abr@c
+\mathcode`h=\abr@c
+\mathcode`i=\abr@c
+\mathcode`j=\abr@c
+\mathcode`k=\abr@c
+\mathcode`l=\abr@c
+\mathcode`m=\abr@c
+\mathcode`n=\abr@c
+\mathcode`o=\abr@c
+\mathcode`p=\abr@c
+\mathcode`q=\abr@c
+\mathcode`r=\abr@c
+\mathcode`s=\abr@c
+\mathcode`t=\abr@c
+\mathcode`u=\abr@c
+\mathcode`v=\abr@c
+\mathcode`w=\abr@c
+\mathcode`x=\abr@c
+\mathcode`y=\abr@c
+\mathcode`z=\abr@c
+\c@abr@ctr=\itfam
+\multiply\c@abr@ctr"100\relax
+\advance\c@abr@ctr "7041\relax
+\mathcode`A=\abr@c
+\mathcode`B=\abr@c
+\mathcode`C=\abr@c
+\mathcode`D=\abr@c
+\mathcode`E=\abr@c
+\mathcode`F=\abr@c
+\mathcode`G=\abr@c
+\mathcode`H=\abr@c
+\mathcode`I=\abr@c
+\mathcode`J=\abr@c
+\mathcode`K=\abr@c
+\mathcode`L=\abr@c
+\mathcode`M=\abr@c
+\mathcode`N=\abr@c
+\mathcode`O=\abr@c
+\mathcode`P=\abr@c
+\mathcode`Q=\abr@c
+\mathcode`R=\abr@c
+\mathcode`S=\abr@c
+\mathcode`T=\abr@c
+\mathcode`U=\abr@c
+\mathcode`V=\abr@c
+\mathcode`W=\abr@c
+\mathcode`X=\abr@c
+\mathcode`Y=\abr@c
+\mathcode`Z=\abr@c}
+
+\newcommand{\TeXmath}{%
+\mathcode`a="7161%
+\mathcode`b="7162%
+\mathcode`c="7163%
+\mathcode`d="7164%
+\mathcode`e="7165%
+\mathcode`f="7166%
+\mathcode`g="7167%
+\mathcode`h="7168%
+\mathcode`i="7169%
+\mathcode`j="716A%
+\mathcode`k="716B%
+\mathcode`l="716C%
+\mathcode`m="716D%
+\mathcode`n="716E%
+\mathcode`o="716F%
+\mathcode`p="7170%
+\mathcode`q="7171%
+\mathcode`r="7172%
+\mathcode`s="7173%
+\mathcode`t="7174%
+\mathcode`u="7175%
+\mathcode`v="7176%
+\mathcode`w="7177%
+\mathcode`x="7178%
+\mathcode`y="7179%
+\mathcode`z="717A%
+\mathcode`A="7141%
+\mathcode`B="7142%
+\mathcode`C="7143%
+\mathcode`D="7144%
+\mathcode`E="7145%
+\mathcode`F="7146%
+\mathcode`G="7147%
+\mathcode`H="7148%
+\mathcode`I="7149%
+\mathcode`J="714A%
+\mathcode`K="714B%
+\mathcode`L="714C%
+\mathcode`M="714D%
+\mathcode`N="714E%
+\mathcode`O="714F%
+\mathcode`P="7150%
+\mathcode`Q="7151%
+\mathcode`R="7152%
+\mathcode`S="7153%
+\mathcode`T="7154%
+\mathcode`U="7155%
+\mathcode`V="7156%
+\mathcode`W="7157%
+\mathcode`X="7158%
+\mathcode`Y="7159%
+\mathcode`Z="715A}
+
+\noTeXmath
+

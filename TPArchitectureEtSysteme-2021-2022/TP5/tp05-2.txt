@@ -1,0 +1,6 @@
+Un texte contenant un caractère accentué peut poser problème lors d'une recherche.
+
+Imaginez les difficultés que cela peut poser lorsque ce type de texte est dans une base de données.
+
+Que proposez vous pour corriger tous ça ?
+

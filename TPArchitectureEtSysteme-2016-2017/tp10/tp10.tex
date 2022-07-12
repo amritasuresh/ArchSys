@@ -1,0 +1,170 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{10}
+% Titre du TP
+\newcommand{\titretd}{Les threads}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+Page web du cours :                                                                                                                                                                                                                                            
+\begin{center}
+\url{http://www.lsv.ens-cachan.fr/~schwoon/enseignement/systemes/ws1617/}.
+\end{center}
+
+Sources du TP disponibles dans le répertoire <<\textasciitilde{}fhh/share/tp/tp10>> du département informatique.
+
+Pensez \`a utiliser \texttt{man} pour d\'ecouvrir les d\'etails
+des appels syst\`eme et des commandes dans le shell.
+
+\section{S\'emaphores}
+
+Rappelez-vous que les threads d'un m\^eme processus partagent leur m\'emoire
+(sauf la pile) ; notamment ils partagent les variables statiques et
+dynamiquement allou\'ees. On consid\`ere le programme suivant 
+(\texttt{counter.c}):
+
+\begin{verbatim}
+#include <pthread.h>
+#include <stdio.h>
+
+#define MAX 100000
+int ctr = 0;
+
+void* count(void* data) {
+  int i;
+  for (i = 0; i < MAX; i++) ctr++;
+}
+
+int main () {
+  pthread_t t1, t2;
+  pthread_create(&t1, NULL, count, NULL);  // create first thread
+  pthread_create(&t2, NULL, count, NULL);  // create second thread
+  pthread_join(t1, NULL);  // wait for first thread
+  pthread_join(t2, NULL);  // wait for second thread
+  printf("Compteur: %d\n", ctr);
+}
+\end{verbatim}
+
+\begin{enumerate}
+\item[(a)] Quel est le r\'esultat attendu pour ce programme ?
+\item[(b)] Qu'est-ce qui peut emp\^echer le r\'esultat attendu ?
+\item[(c)] Quels r\'esultats sont (th\'eoriquement) possibles ?
+\end{enumerate}
+
+Les \emph{s\'emaphores} repr\'esentent une solution pour r\'esoudre le
+probl\`eme des acc\`es concurrents aux variables. Un s\'emaphore est
+une strucutre de donn\'ees utilis\'ee pour la synchronisation et pour
+assurer un acc\`es coordonn\'e aux ressources partag\'es. En C,
+les s\'emaphores sont d\'efinis par le fichier
+\texttt{semaphore.h}. Les fonctions les plus importantes pour nos
+objectifs seront les suivantes :
+%
+\begin{itemize}
+\item
+  \verb|int sem_init(sem_t *sem, int pshared, unsigned int value);|\\ 
+  Initialise \verb|sem| avec la valeur donn\'ee ce qui donne le nombre
+  de cr\'eneaux disponibles pour acc\'eder \`a une ressource au m\^eme temps.
+  Pour nos objectifs, \verb|pshared| devrait \^etre \verb|NULL|.
+\item \verb|int sem_wait(sem_t *sem);|\\ Si le s\'emaphore a la valeur 0
+  cette fonction attend qu'un cr\'eneau devienne disponible. Sinon,
+  elle d\'ecro\^it sa valeur imm\'ediatement.
+\item \verb|int sem_post(sem_t *sem);|\\ Augmente la valeur de la
+  s\'emaphore (un cr\'eneau devient disponible).
+\end{itemize}
+%
+\'Etudiez les pages \verb|man| pour en savoir plus.
+
+\begin{enumerate}
+\item[(d)] Utilisez les s\'emaphores pour r\'eparer le programme \texttt{counter.c}.
+\end{enumerate}
+
+Enfin, consid\'erons le programme suivant (\texttt{order.c}) :
+\begin{verbatim}
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void* first(void* data)  { printf("First\n");  }
+void* second(void* data) { printf("Second\n"); }
+void* third(void* data)  { printf("Third\n");  }
+
+int main () {
+  pthread_t t1, t2, t3;
+  
+  pthread_create(&t3, NULL, third, NULL);
+  pthread_create(&t2, NULL, second, NULL);
+  pthread_create(&t1, NULL, first, NULL);
+
+  // wait for all threads
+  pthread_join(t1, NULL);  pthread_join(t2, NULL); pthread_join(t3, NULL);
+}
+\end{verbatim}
+Modifiez le programme pour assurer que le programme donne toujours la
+ sortie suivant :
+\begin{verbatim}
+  First
+  Second
+  Third
+\end{verbatim}
+
+\begin{enumerate}
+\item[(e)]
+ \'Ecrivez un programme en C avec deux threads. Le premier thread
+ affiche les entiers pairs jusqu\`a 100, le deuxi\`eme les impairs.
+ Utilisez des s\'emaphores pour assurer le bon ordre des entiers.
+\end{enumerate}
+
+\section{Producer/consumer}
+
+Un probl\`eme typique dans la programmation concurrente est celui du
+\emph{producteur et consommateur} : un processus produit des donn\'ees
+que l'autre consomme. On consid\`ere le programme 
+\texttt{procon.c}. Ici, le producteur obtient des caract\`eres dans un
+fichier et les envoie vers un espace partag\'e avec le processus consommateur
+qui les affiche sur l'\'ecran. Cependant, dans la version actuelle,
+aucune synchronisation existe entre les deux.
+
+Modifiez le programme tel qu'il affiche le contenu d'un fichier correctement.
+
+\section{Mandelbrot}
+
+Soit $c$ un nombre complexe. On consid\`ere la s\'erie
+$z_0:=0$ et $z_{n+1}:=z_n^2+c$ pour $n\ge0$. L'\emph{ensemble de Mandelbrot}
+est d\'efini comme l'ensemble des valeurs $c$ telles que la s\'erie des $z_n$
+est born\'ee. On sait que cela est le cas si $z_n$ ne sort jamais d'un
+cercle de radius 2 autour de 0. Si jamais la s\'erie sort de ce cercle,
+soit $m(c)$ le plus petit indice $n$ tel que c'est le cas.
+
+Une application populaire pour $m(c)$ est de cr\'eer
+de jolies images ; on associe l'\'ecran avec un rectangle et chaque pixel
+avec la valeur $c$ qui y correspond ; le pixel est ensuite peint avec
+une couleur correspondant \`a $m(c)$.
+
+La page web du cours contient un tel programme. Votre t\^ache consiste
+en l'accelerant en lan\c{c}ant plusieurs threads en parall\`ele.
+Les machines de la salle 411 sont \'equip\'ees de plusieurs c\oe{}urs
+(utilisez \texttt{cat /proc/cpuinfo} pour trouver plus d'information).
+Chaque thread va donc travailler sur une partie diff\'erent de l'image.
+
+Note: Compilez le programme avec \texttt{make}.
+
+Note (2): Cet exercice ne n\'ecessite pas de s\'emaphores.
+
+Pages man utiles : pthreads(7), pthread\_create(3), pthread\_join(3).
+
+\end{document}

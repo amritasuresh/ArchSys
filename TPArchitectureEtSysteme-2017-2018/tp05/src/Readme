@@ -1,0 +1,5 @@
+C code for Unicode normalization.
+
+See https://www.unicode.org/versions/Unicode10.0.0/ch03.pdf for background.
+
+Run with "uni -?" to see options.

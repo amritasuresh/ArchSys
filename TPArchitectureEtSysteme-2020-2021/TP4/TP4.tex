@@ -1,0 +1,174 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\usepackage{hyperref}
+\selectlanguage{french}
+\usepackage[toc,page]{appendix}
+
+
+\usepackage[dvipsnames]{xcolor}
+
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+\usepackage{tikz}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\urlstyle{same}
+
+
+
+% Numéro du TP
+\newcommand{\numtd}{03}
+% Titre du TP
+\newcommand{\titretd}{Data Representation}
+\def\tup#1{\langle #1\rangle}
+\begin{document}
+	
+	\entete{\numtd}{\titretd}
+
+
+\subsection*{Warming up:}
+For the 16-bit codes: $0000 0000 0010 1010$ and $1000 0000 0010 1010$ Give their values, if they are representing:
+
+\begin{itemize}
+    \item a 16-bit unsigned integer;
+    \item a 16-bit signed integer;
+    \item two 8-bit unsigned integers;
+    \item two 8-bit signed integers;
+    \item a 16-bit Unicode characters;
+    \item two 8-bit ISO-8859-1 characters
+\end{itemize}
+
+\bigskip
+
+How would you represent "Hello, how are you?" in ASCII? (look for the comma, question mark, and space characters in the ASCII table)
+
+
+\section{Character encoding in HTML}
+HTML pages have several ways to encode characters:
+\begin{itemize}
+    \item Entity references which is an alternative name for a series of characters. You can use an entity in the \texttt{\&name;} format, where name is the name of the entity
+    \item Numeric references that give the code of a Unicode character, in the form 
+    \texttt{\&\#}\emph{nnn}\texttt{;} (décimal) or
+\texttt{\&\#x}\emph{nnn}\texttt{;}.\smallskip
+    \item Direct binary coding in one of the formats discussed in the course (UTF-8, ISO-8859-1, \ldots). This requires adding a tag of the form
+    \begin{quote}
+  \texttt{<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />}
+ \end{quote}
+ in the \texttt{header} of the HTML document.
+\end{itemize}
+We will consider the names of the following European municipalities:
+ \begin{quote}
+ Crèvec\oe{}ur (France)\\ L'Ha\"y-les-Roses (France)\\ Krom\v{e}\v{r}\'i\v{z}
+(Tchéquie)\\ G\"od\"oll\H{o} (Hongrie)\\ S\"u\ss{}en (Allemagne)\\
+Pr\ae{}st\o{} (Danemark)
+ \end{quote}
+
+\begin{enumerate}
+    \item Create an HTML document that displays these names with their entity references.
+    \item Look for Unicode codes for non-ASCII characters and use them to recreate the list with numeric references.
+    \item Create an HTML document in UTF-8 directly with your text editor.
+\end{enumerate}
+
+
+
+
+\section{Analyzing an error}
+
+
+\subsection{In the html pages}
+Visit the \url{http://www.lsv.fr/~fhh/tp05-1}\bigskip. Describe what is happening using the tables of characters available on the internet (\url{https://fr.wikipedia.org/wiki/Table_des_caractères_Unicode_(0000-0FFF)}). 
+And Provide a solution to correct this problem.
+
+
+\begin{solution}
+
+Nous sommes face à un problème d'encodage. Les caractères spéciaux s'affichent
+sur deux ou trois caractères au lieu d'un. Il semble que nous soyons face à une
+page UTF-8 interprétée en ISO8859-1.
+
+\begin{itemize}
+\item Ã© : Ã = 00c3 soit 11000011 ; © = 00a8 soit 10101000
+\item Ã§ :
+\item Ã\"{ } : 
+\end{itemize}
+
+\end{solution}
+
+
+
+\section{File encoding problem}
+Download the text file \url{http://www.lsv.fr/~fhh/tp05-2.txt} and view it in your browser.
+
+Search "é" with Firefox and Chrome.
+
+Search "é" with the command "grep" on the downloaded file the. 
+
+What do you see? 
+
+Suggest a solution to correct this type of problem.
+
+
+\begin{solution}
+Les <<é>> sont codés de deux manière différentes. <<hexdump -C>> donne les codages des caractères.
+
+Solution utiliser uconv -x NFD avant de mettre ce type de fichier dans une base de donnée.
+\end{solution}
+
+
+\section{Floating point}
+
+For this question, you can complete the float-skel.c  and  float-full.c files (look at \url{https://sites.google.com/site/farzadjafarrahmani/home/architecture-systems-course}).
+
+
+Reminder : In c, the type \texttt{float} is represented according to the IEEE 754 standard in the 32 bit. 1 bit for the sign, 8 for the exponent and 23 for the mantisse. 
+
+\begin{quote}
+\verb+typedef struct { int signe; int exposant; int mantisse; } fc;+
+\end{quote}
+
+
+\begin{enumerate}
+\item Write a C function that decomposes a float into its three components. For example, the representation of  2.5 in IEEE 754 is:
+\begin{quote}
+\verb+0 . 1000 0000 . 010 0000 0000 0000 0000 0000+
+\end{quote}
+In this case, the returned structure would contain $\mathtt{sign}=0$, $\mathtt{exposant}=0x80=128$ and $\mathtt{mantisse}=0x200000=2097152$.
+
+Reminder : To do this, it is convenient to use typecast. 
+
+
+\item Create a function that does the opposite, that is to say that returns the \texttt{float} corresponding to a given \verb+fc+ structure.
+
+
+\item Realize the actual addition based on the addition of integers by going through the structures of \verb+fc+. To simplify, we will make the following restrictions: (i) both operands are positive
+  (ii) no special cases NaN / Inf etc.
+
+Addition in the \verb+fc+ type is done in three steps:
+\begin{enumerate}
+\item Standardize the two values, i.e. if the two exponents are
+different, we adjust the mantissa of one of the two according to the
+difference.
+\item Add the sum of the two mantissas, taking into account the  ``hidden" bit
+representing the 1.
+\item Normalize the mantissa for whatever is in $[1,2)$, while adjusting
+the exponent of the result.
+\end{enumerate}
+
+\end{enumerate}
+
+
+
+
+\end{document}

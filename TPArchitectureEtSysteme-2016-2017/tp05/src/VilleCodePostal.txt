@@ -1,0 +1,7 @@
+Paris;75000
+Caen;14000
+L'Haÿ-les-Roses;94240
+Saint-Hilarion;78120
+Charleville-Mézières;08000
+€urope;00000
+Schœlcher;97233

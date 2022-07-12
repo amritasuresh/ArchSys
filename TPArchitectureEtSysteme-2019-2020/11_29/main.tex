@@ -1,0 +1,183 @@
+\documentclass{exam}
+\usepackage[]{tps}
+
+%\if\answers0\noprintanswers\fi
+%\if\answers1\printanswers\fi
+
+\title{Processus \& tubes}
+\author{Gabriel Hondet\\\texttt{gabriel.hondet@lsv.fr}}
+
+\begin{document}
+\maketitle
+
+\begin{questions}
+  \titledquestion{Fichiers louches}
+  Téléchargez le fichier
+  \url{http://www.lsv.fr/~hondet/resources/archos/touch_weird.sh.x} et exécutez
+  le.
+  Trois fichiers (vides) devraient être apparus dans votre répertoire courant.
+  Supprimez-les en utilisant \emph{uniquement} la ligne de commande.\\
+  \emph{Indication:} comment sont identifiés les fichiers de manière générale?
+
+  \begin{solution}
+    Utiliser les inodes: \verb|ls -i| et \verb|find . -inum ... -exec rm {} \;|
+  \end{solution}
+
+\titledquestion{Programme erroné}
+Considérons
+\url{http://www.lsv.fr/~hondet/resources/archos/closed_pipe.c}.
+Le fils est censé imprimer les caractères que lui envoie le père: expliquez le
+dysfonctionnement et corrigez le programme.
+
+\begin{solution}
+  The read end \texttt{p[0]} of the pipe is closed before forking, hence the
+  child cannot read from it. Moving \verb|close(p[0])| below
+  \verb|if (fork()) { | solves the problem.
+\end{solution}
+
+\titledquestion{Tubes et remplacement de code}
+Écrivez un programme (en C) qui télécharge l'archive
+\url{http://www.lsv.fr/~hondet/resources/archos/shell-bootstrap.tar.gz},
+et la décompresse sans créer de fichier temporaire. Dit autrement, on veut
+coder la commande \verb+curl <url> | tar xz+ en C. Les programmes \verb+curl+
+et \verb+tar+ seront appelés par \verb+exec+ ou dérivés.
+
+\begin{solution}
+  To perform the pipe, the main program forks into two sub programmes, one
+  for each part of the pipe (\textit{Question for the reader:} can we use only
+  one fork?). The main difficulty is to modify adequately file descriptors so
+  that the download child writes the data where the decompressing child reads.
+  \inputminted{C}{download.c}
+\end{solution}
+
+\titledquestion{La fonction d'Hénon, partie I}
+On va calculer l'orbite d'un système dynamique de dimension 2. La fonction
+d'Hénon est définie par le système
+\begin{equation}
+  \label{eq:1}
+  H_{a,b} = \left\{
+    \begin{aligned}
+      x_{n+1} &= a - by_{n} - x_{n}^{2} \\
+      y_{n+1} &= x_{n}.
+    \end{aligned}
+    \right.
+\end{equation}
+On utilisera un processus pour calculer la suite \( (x_{n})_{n} \) et un autre
+processus pour calculer la suite \( (y_{n})_{n} \). Les processus échangeront
+leurs données via un (ou des) tube(s). Pour éviter d'avoir à mettre en place une
+synchronisation entre les processus, on pourra utiliser des pauses
+\verb|sleep(1)|.
+
+\begin{solution}
+  \inputminted{C}{henon/henon_simple.c}
+\end{solution}
+
+Comment mettre en place une synchronisation par signaux?
+\begin{solution}
+  Le père commence par transmettre le \textit{pid} des enfants entre eux, pour
+  qu'ils puissent s'échanger des signaux. Ensuite on peut utiliser un
+  \verb|sigwait| bien placé.
+  \inputminted{C}{henon/henon_sync_signal.c}
+\end{solution}
+
+Par la suite, on crééra en plus un processus dédié à la sortie: ce processus
+doit écrire des lignes sous la forme \texttt{0.3415 1.2451} où le premier nombre
+est $x_{n}$ et le deuxième $y_{n}$ dans un fichier \texttt{henon.dat}.
+
+On pourra tracer la fonction avec la commande \texttt{gnuplot henon.p} après
+avoir téléchargé le script
+\url{http://www.lsv.fr/~hondet/resources/archos/henon.p}. Le fichier
+\texttt{henon.dat} doit être dans le même dossier que \texttt{henon.p}.
+
+Pour \( a = 1.4 \) et \( b = -0.3 \), la fonction est chaotique (au sens de
+Devaney), c'est-à-dire,
+\begin{itemize}
+  \item la fonction est sensiblement dépendante des conditions initiales (effet
+    papillon, imprédictabilité);
+  \item la fonction est topologiquement transitive (indécomposabilité);
+  \item les points périodiques sont denses dans le domaine de définition de
+    $H_{a, b}$ (régularité).
+\end{itemize}
+et possède un attracteur étrange.
+
+Pour plus d'informations sur les systèmes dynamiques, voir \textit{An
+  introduction to Chaotic Dynamical Systems}, Robert~L.~Devaney, Westview.
+
+\begin{solution}
+  \inputminted[tabsize=2]{C}{henon/henon.c}
+\end{solution}
+
+\titledquestion{Coquille vide}
+Vous trouverez le squelette de base du code C que l'on va utiliser pour recoder
+un shell. Pour compiler le projet, utilisez la commande \mintinline{bash}{make}.
+Par défault, le shell ne peut pas faire grand chose. On va essayer de le
+compléter pas à pas. On va d'abord s'intéresser à la fonction
+\mintinline{C}{execute}:
+
+Le cas de base, correspond au cas \mintinline{C}{C_PLAIN}. Donner un exemple de
+commande qui une fois parsée retourne un objet \mintinline{C}{cmd} tel que
+\mintinline{C}{cmd->type == C_PLAIN}. En utilisant \mintinline{C}{ps}, observer
+ce qui se passe dans un terminal lorsque vous lancez une commande.
+
+Pour le moment, toute commande de base sera tout simplement exécutée. Pour
+exécuter une commande, la librairie \texttt{glibc} offre un panel de fonctions
+dont on peut avoir un aperçu en utilisant la commande
+
+\begin{minted}{bash}
+  man exec
+\end{minted}
+
+Selon vous, quelle fonction serait la plus appropriée dans notre cas
+(justifier)? En utilisant toutes ces observations, remplir le trou
+\mintinline{C}{C_PLAIN}.
+
+Quel est le symbol pour l'opérateur de séquence en bash? Donner un exemple de
+commande où la séquence se comporte différemment de l'opérateur \textit{et}
+logique.
+
+Implémenter le cas \mintinline{C}{C_SEQ}.
+
+Implémenter les cas \mintinline{C}{C_AND} et \mintinline{C}{C_OR}.
+
+Il est possible en bash d'écrire une commande de la forme
+\begin{mintinline}{bash}
+  (cmd1 \&\& cmd2 | cmd3 ...) 2>/dev/null
+\end{mintinline}
+
+Quel est le rôle des parenthèses dans la commande ci-dessus? Donner un exemple
+d'une commande qui utilise (de façon non triviale) ces parenthèses.
+Implémenter le cas \mintinline{C}{C_VOID}.
+
+Que se passe-t-il si vous faites \texttt{CTRL+C} dans notre shell? Proposer une
+solution pour récupérer la main après que l'utilisateur a entré \texttt{CTRL+C}.
+
+Que se passe-t-il lorsque que vous lancez la commande
+\begin{minted}{C}
+  ls > dump
+\end{minted}
+Pour corriger ce problème, je vous invite à lire les pages de manuel
+\mintinline{bash}{man stdin} et \mintinline{bash}{man dup}. En utilisant toutes
+ces informations, implémenter la fonction \mintinline{C}{apply_redirections}
+puis modifier votre implémentation pour que la commande ci-dessus se comporte
+comme prévu.
+
+Il nous reste finalement à implémenter le cas \mintinline{C}{C_PIPE}, pour cela
+je vous invite à regarder le manuel de \mintinline{bash}{man pipe}. Donner un
+exemple qui met en évidence pourquoi on ne peut pas simplement utiliser
+\mintinline{bash}{dup2} pour réimplémenter le pipe? En utilisant la fonction
+\mintinline{bash}{pipe}, réimplémenter le cas \mintinline{C}{C_PIPE}.
+
+À ce stade, nous avons implémenté un \textit{shell} très rudimentaire, cependant
+il est possible de l'étendre de bien des manières. Voici quelques possibilités
+d'extensions qui peuvent vous rapporter des points bonus:
+
+\begin{itemize}
+  \item Réimplémenter les commandes \mintinline{bash}{ls},
+    \mintinline{bash}{cat} ou \mintinline{bash}{cd}
+  \item Implémenter l'extension des wildcards: \mintinline{bash}{ls *.pdf}
+  \item Implémenter les processus de fond via les commandes:
+    \mintinline{bash}{jobs}, \mintinline{bash}{bg}, \mintinline{bash}{fg}, \dots
+\end{itemize}
+
+\end{questions}
+\end{document}

@@ -1,0 +1,58 @@
+\documentclass{exam}
+\usepackage{../main}
+
+\if\answers0\noprintanswers\fi
+\if\answers1\printanswers\fi
+
+\title{Réseau}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{questions}
+\titledquestion{Élection d'un meneur}
+\begin{parts}
+  \part{} La version réseau du programme, <<ring-net.c>> instancie un
+  seul n\oe{}ud par exécution. Vous pouvez recopier votre fonction
+  <<protocole>> depuis <<ring-pipe.c>>.
+  Le programme prend 3 arguments~: le port d'écoute du n\oe{}ud, le nom du nœud voisin (nom de
+  machine), le port de connexion au nœud voisin. Le programme crée un
+  serveur dans un thread et attend la connexion d'un voisin. En
+  parallèle, dans un autre thread, il tente une connexion sur son
+  voisin (nom de machine et port passés en argument). Écrivez un
+  script mettant en œuvre l'exécution de votre code sur 5 machines du
+  département. Commencez par tester l'exécution de votre code
+  localement (machine localhost en utilisant différents
+  ports). Étendre progressivement la taille de l'anneau.
+  \begin{solution}
+    \inputminted{C}{../12_13/correc/ring/ring-net.c}
+  \end{solution}
+  \part{} À partir des ordinateurs de la salle informatique
+  (connectez vous en SSH si vous n'y êtes pas),
+  créez un anneau avec vos voisins et l'étendre à toute la
+  salle de TP.
+\end{parts}
+
+\titledquestion{Discussions}
+\begin{parts}
+  \part{}
+On se propose de coder une application pour discuter entre nous sur le terminal.
+Il faut donc un programme permettant à la fois de recevoir les messages et de
+les envoyer. Pour cela, on crééra ou bien deux threads, ou bien deux processus.
+L'un d'eux agira en tant que serveur, et l'autre en tant que client. On pourra
+se servir des fonctions disponibles dans
+\url{http://www.lsv.fr/~hondet/resources/archos/packets.c} et
+\url{http://www.lsv.fr/~hondet/resources/archos/packets.h}.
+\begin{solution}
+  \inputminted{C}{chat/client.c}
+\end{solution}
+
+  \part{}
+  Comment faire pour recevoir des messages de plusieurs personnes? Envoyer des
+  messages à plusieurs personnes? Implémenter.
+\begin{solution}
+  Lancer un fil par hote distant.
+\end{solution}
+\end{parts}
+\end{questions}
+\end{document}

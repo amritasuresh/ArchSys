@@ -1,0 +1,125 @@
+\documentclass{exam}
+\usepackage{../tps}
+
+%\if\answers0\noprintanswers\fi
+%\if\answers1\printanswers\fi
+
+\title{Processus \& signaux}
+\author{Gabriel Hondet\\\texttt{gabriel.hondet@lsv.fr}}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{questions}
+
+  \question{}
+  Dans cet exercice on étudie l’utilisation et l’évaluation du code de sortie d’un
+  processus. Normalement, le code de sortie est utilisé pour indiquer par exemple,
+  la résussite ou non d’un programme. Ici, on s’en sert pour communiquer les
+  résultats d’un calcul. (Remarque: le code de sortie doit entre entre 0 et 255,
+  donc ce n’est pas idéal pour ce genre de chose).
+
+  Utilisez make pour compiler.
+
+  \begin{parts}
+    \part{}
+    On commence avec un exemple simple \texttt{simple.c} qui calcule la
+    somme de deux entiers. Complétez le programme tel que le fils utilise exit
+    pour communiquer la somme au père et que le père reçoit cette valeur par
+    \texttt{wait}.
+%    \begin{solution}
+%    	input minted
+%      %\inputminted{C}{corrected/simple.c}
+%    \end{solution}
+
+
+    \part{}
+    Application plus complexe: télécharger l’archive
+    \url{www.lsv.fr/~hondet/resources/archos/calc.zip} qui
+    contient un calculateur simple qui évalue des expressions avec des entiers
+    naturels, additions, multiplications et soustractions. Dans l’état actuel le
+    programme convertit l’expression vers un arbre, puis il traverse les noeuds de
+    l’arbre un par un pour calculer les valeurs de toutes les sous-expressions.
+    Votre tâche est de permettre au programme de calculer les sous-expressions en
+    parallèle. Lorsque le programme évalue une sous-expression, il devrait lancer
+    deux processus fils qui évaluent leurs sous-expressions et qui communiquent le
+    résultat au père par leurs codes de sortie. Le père attend les deux résultats
+    et applique l’opération correspondante pour obtenir son propre résultat. Il
+    (devrait) suffire de modifier la fonction \texttt{compute} dans
+    \texttt{main}.
+   % \begin{solution}
+      %\inputminted[tabsize=2]{C}{corrected/calc_main.c}
+    %  calc_main
+    %\end{solution}
+    \end{parts}
+
+    \question{}
+    Écrire un programme qui:
+    \begin{itemize}
+      \item crée un processus fils;
+      \item transmet une séquence de bits entrés au clavier (l'utilisateur entre
+            des 0 et des 1), bit par bit à ce processus fils.
+    \end{itemize}
+    Le processus fils doit afficher la séquence dans le bon ordre. Pour cela,
+    utilisez des signaux. Prenez bien soin de tester plusieurs motifs de
+    séquences (alternances de 0/1, successions de 0, successions de 1).
+
+    Pour entrer les bits, vous pouvez utiliser
+    %\begin{minted}{c}
+      %for (c = 0; c != 0 && c != 1 && c != EOF; c = getchar());
+      %if (c == 0) // Do something
+      %if (c == 1) // Do something
+      %if (c == EOF) break;
+    %\end{minted}
+
+    \begin{parts}
+      \part{}
+      Implémentez dans un premier temps avec l'API ANSI C
+      (fonctions \texttt{kill}, \texttt{pause}, \texttt{signal}).
+     % \begin{solution}
+        %\inputminted{C}{corrected/pingpong1.c}
+      %\end{solution}
+      \part{} puis avec l'API Posix.
+%      \begin{solution}
+%        \inputminted{C}{corrected/pingpong4.c}
+%      \end{solution}
+    \end{parts}
+
+  \question{}
+  Programmation système et \(\lambda\) calcul ne sont pas incompatibles: le
+  dialecte \textsc{Guile} du \textsc{Scheme} implémente les API Posix.
+  Écrivez un programme (en Guile) qui
+  \begin{itemize}
+    \item se fork
+    \item le père attend un certain temps puis tue son fils (\texttt{SIGINT}),
+    \item le fils imprime des citations sur la sortie standard avec la commande
+      \texttt{fortune -e} (\texttt{-o} pour être insultant) et une pause entre
+      chaque sortie.
+  \end{itemize}
+
+  Vous aurez besoin de la doc Guile sur Posix
+  \url{https://www.gnu.org/software/guile/manual/html_node/POSIX.html}.
+
+  Comme point de d\'epart:
+\begin{verbatim}{scheme}
+#!/usr/bin/guile \
+-e main -s
+!#
+(define (main args)
+  (let ((pid (primitive-fork)))
+    (if (= pid 0)
+        (...)
+        (...))))
+...
+\end{verbatim}
+  le fichier peut être rendu exécutable puis être interprété.
+
+  Vous pouvez bien entendu l'implémenter d'abord en C, pour apprécier le
+  \texttt{execl} ou \texttt{execlp}.
+%  \begin{solution}
+%    \inputminted{scheme}{corrected/fork.scm}
+%  \end{solution}
+\end{questions}
+\end{document}

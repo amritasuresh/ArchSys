@@ -1,0 +1,2 @@
+AUX != ls corrected/*
+main.pdf: ${AUX}

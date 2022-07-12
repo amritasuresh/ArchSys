@@ -1,0 +1,139 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{10}
+% Titre du TP
+\newcommand{\titretd}{Les threads}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+Page web du cours :                                                                                                                                                                                                                                            
+\begin{center}
+\url{http://www.lsv.ens-cachan.fr/~schwoon/enseignement/systemes/ws1718/}.
+\end{center}
+
+Sources du TP disponibles dans le répertoire <<\textasciitilde{}fhh/share/tp/tp10>> du département informatique.
+
+Pensez à utiliser \texttt{man} pour découvrir les détails
+des appels système et des commandes dans le shell.
+
+\section{Sémaphores}
+
+Lors du TP09, nous avons étudié et implémenté l'algorithme d'exclusion mutuelle de Peterson et constaté les problèmes liés aux optimisations des processeurs récents.
+
+Les \emph{sémaphores} représentent une solution pour résoudre le
+problème des accès concurrents aux variables. Un sémaphore est
+une strucutre de données utilisée pour la synchronisation et pour
+assurer un accès coordonné aux ressources partagés. En C,
+les sémaphores sont définis par le fichier
+\texttt{semaphore.h}. Les fonctions les plus importantes pour nos
+objectifs seront les suivantes :
+%
+\begin{itemize}
+\item
+  \verb|int sem_init(sem_t *sem, int pshared, unsigned int value);|\\ 
+  Initialise \verb|sem| avec la valeur donnée ce qui donne le nombre
+  de créneaux disponibles pour accéder à une ressource au même temps.
+  Pour nos objectifs, \verb|pshared| devrait être \verb|NULL|.
+\item \verb|int sem_wait(sem_t *sem);|\\ Si le sémaphore a la valeur 0
+  cette fonction attend qu'un créneau devienne disponible. Sinon,
+  elle décroît sa valeur immédiatement.
+\item \verb|int sem_post(sem_t *sem);|\\ Augmente la valeur de la
+  sémaphore (un créneau devient disponible).
+\end{itemize}
+%
+étudiez les pages \verb|man| pour en savoir plus.
+
+\begin{enumerate}
+\item[(a)] Utilisez les sémaphores pour remplacer l'algorithme de Peterson et réparer le programme \texttt{counter.c}.
+\end{enumerate}
+
+Enfin, considérons le programme suivant (\texttt{order.c}) :
+\begin{verbatim}
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void* first(void* data)  { printf("First\n");  }
+void* second(void* data) { printf("Second\n"); }
+void* third(void* data)  { printf("Third\n");  }
+
+int main () {
+  pthread_t t1, t2, t3;
+  
+  pthread_create(&t3, NULL, third, NULL);
+  pthread_create(&t2, NULL, second, NULL);
+  pthread_create(&t1, NULL, first, NULL);
+
+  // wait for all threads
+  pthread_join(t1, NULL);  pthread_join(t2, NULL); pthread_join(t3, NULL);
+}
+\end{verbatim}
+Modifiez le programme pour assurer que le programme donne toujours la
+ sortie suivant :
+\begin{verbatim}
+  First
+  Second
+  Third
+\end{verbatim}
+
+\begin{enumerate}
+\item[(b)]
+ écrivez un programme en C avec deux threads. Le premier thread
+ affiche les entiers pairs jusquà 100, le deuxième les impairs.
+ Utilisez des sémaphores pour assurer le bon ordre des entiers.
+\end{enumerate}
+
+\section{Producer/consumer}
+
+Un problème typique dans la programmation concurrente est celui du
+\emph{producteur et consommateur} : un processus produit des données
+que l'autre consomme. On considère le programme 
+\texttt{procon.c}. Ici, le producteur obtient des caractères dans un
+fichier et les envoie vers un espace partagé avec le processus consommateur
+qui les affiche sur l'écran. Cependant, dans la version actuelle,
+aucune synchronisation n'existe entre les deux.
+
+Modifiez le programme tel qu'il affiche le contenu d'un fichier correctement.
+
+\section{Mandelbrot}
+
+Soit $c$ un nombre complexe. On considère la série
+$z_0:=0$ et $z_{n+1}:=z_n^2+c$ pour $n\ge0$. L'\emph{ensemble de Mandelbrot}
+est défini comme l'ensemble des valeurs $c$ telles que la série des $z_n$
+est bornée. On sait que cela est le cas si $z_n$ ne sort jamais d'un
+cercle de radius 2 autour de 0. Si jamais la série sort de ce cercle,
+soit $m(c)$ le plus petit indice $n$ tel que c'est le cas.
+
+Une application populaire pour $m(c)$ est de créer
+de jolies images ; on associe l'écran avec un rectangle et chaque pixel
+avec la valeur $c$ qui y correspond ; le pixel est ensuite peint avec
+une couleur correspondant à $m(c)$.
+
+La page web du cours contient un tel programme. Votre tâche consiste
+à l'accélérer en lançant plusieurs threads en parallèle.
+Les machines de la salle 411 sont équipées de plusieurs c\oe{}urs
+(utilisez \texttt{cat /proc/cpuinfo} pour trouver plus d'information).
+Chaque thread va donc travailler sur une partie différente de l'image.
+
+Note: Compilez le programme avec \texttt{make}.
+
+Note (2): Cet exercice ne nécessite pas de sémaphores.
+
+Pages man utiles : pthreads(7), pthread\_create(3), pthread\_join(3).
+
+\end{document}

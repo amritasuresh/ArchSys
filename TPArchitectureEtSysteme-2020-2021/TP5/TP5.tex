@@ -1,0 +1,275 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\selectlanguage{french}
+
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+
+% Numéro du TP
+\newcommand{\numtd}{06}
+% Titre du TP
+\newcommand{\titretd}{Construction d'un système d'exploitation Debian Stretch minimal}
+
+\graphicspath{{imgs/}}
+
+
+
+\begin{document}
+
+\entete{\numtd}{\titretd}
+
+\begin{introduction}
+L'objectif de cette séance de travaux pratiques est de construire un système
+Debian Stretch minimal (Stretch, ou 9.X est stable,
+<<\url{http://www.debian.org}>>). Cette construction illustre, au travers de
+Debian, le principe de démarrage d'un système Unix, son architecture et les
+principes de son installation, le partitionnement d'un disque dur, la création
+de systèmes de fichiers (formatage), leurs montages, etc.
+\end{introduction}
+
+\section{Création d'une machine virtuelle}
+
+L'installation du système d'exploitation (OS) GNU/Linux Debian sera effectuée
+dans une machine virtuelle KVM/Qemu disponible sur les machines de la salle de
+TP, mais peut également être réalisé sur Oracle Virtual Box
+(\url{https://www.virtualbox.org/}).
+
+En très simplifié, une machine virtuelle de ce type peut être résumée par un
+disque dur virtuel, un fichier, que nous utiliserons avec l'émulateur
+d'ordinateur QEMU.
+
+La première étape consiste à créer le fichier qui nous servira de disque dur
+virtuel via la commande <<qemu-img>>.
+
+Utilisez l'aide de <<qemu-img>>, pour générer un disque <<hda.qcow2>> de 5G au
+format qcow2 directement dans <</tmp/>>.
+
+\begin{solution}
+fhh@melusine ~ \$ qemu-img create -f qcow2 /tmp/hda.qcow2 5G\\
+Formatting '/tmp/hda.qcow2', fmt=qcow2 size=5368709120 encryption=off cluster\_size=65536 lazy\_refcounts=off refcount\_bits=16
+\end{solution}
+
+\section{Récupération du CD-Rom d'installation de Debian}
+
+Le CD-Rom \emph{<<NetInstall>>} d'installation de Debian ou un CD-Rom
+\emph{<<Live>>} de \emph{<<Debian Like>>} est suffisant pour l'installation
+minimale du système.
+
+Téléchargez le CD-Rom \emph{"NetInstall"} \textbf{du jour} de Debian Linux ou
+n'importe quel Live basé sur Debian.
+
+\emph{NB : La seule condition pour réaliser l'installation est que l'utilitaire
+<<debootstrap>> soit présent sur le live CD.}
+
+\emph{NB : La suite de ce TD se base sur le Live CD NetInstall de Debian.}
+
+\section{Démarrer la machine virtuelle sur le CD-Rom}
+
+La commande permettant de démarrer une machine virtuelle 32bits est
+<<qemu-system-i386>>.
+
+Consultez la page de manuel de <<qemu>> et trouvez la commande permettant de
+démarrer une VM 64bits.
+
+\begin{solution}
+qemu-system-x86\_64
+\end{solution}
+
+Voici quelques options nécessaires au démarrage de votre VM :
+
+\begin{itemize}
+ \item \textbf{-cdrom} spécifie le CDROM à utiliser ;
+ \item \textbf{-net} permet de rediriger le port de la machine virtuelle sur
+un port de la machine locale ;
+ \item \textbf{-m} pour spécifier la quantité de mémoire à utiliser ;
+ \item \textbf{-boot} spécifie le média sur lequel démarrer ;
+ \item \textbf{-enable-kvm} active l'accélération matérielle.
+\end{itemize}
+
+Recherchez les options proposées dans les pages de manuel de <<qemu>> et
+démarrez une machine virtuelle 64bits, bénéficiant de l'accélération matérielle,
+équipée de 4G de RAM sur l'image de CDROM téléchargée et utilisant le disque
+généré précédement.
+
+\begin{solution}
+qemu-system-x86\_64 -m 4096 -net user,hostfwd=tcp::2222-:22 -net nic -cdrom downloads/mini.iso -boot
+d /tmp/hda.qcow2
+\end{solution}
+
+Démarrez la machine virtuelle est choisir \emph{<<Advanced options $>$>>} puis
+\emph{<<Rescue mode>>}.
+
+\section{Configuration du système live Debian NetInstall}
+
+Configurez le système Debian NetInstall en suivant les menus proposés et entrez
+dans le mode <<restauration>>.
+
+À ce stade et quelque soit le système \emph{<<live>>} choisi, vous devez avoir
+accès à un shell.
+
+Vérifiez que vous disposez à minima de la commande \emph{<<fdisk>>} et de
+\emph{<<debootstrap>>}. Dans le cas contraire, choisissez un autre Live CD.
+
+\section{Installation du système de base}
+
+\subsection{Partitionnement du disque de la VM}
+
+Partitionnez la machine virtuelle en utilisant l'utilitaire de votre choix
+(<<fdisk>> est recommandé).
+
+\begin{solution}
+Voir <<fdisk>> avec eux.
+\end{solution}
+
+Créez le partitionnement suivant :
+
+\begin{itemize}
+ \item première partition primaire : / (type 83 dans fdisk) 4G ext4
+ \item première partition logique : swap (type 82) environ 1G
+ \item première partition primaire bootable (option 'a' dans fdisk)
+\end{itemize}
+
+\subsection{Création des systèmes de fichiers}
+
+Créez les systèmes de fichiers via les commandes \emph{<<mkfs.ext4>>} et
+\emph{<<mkswap>>}.
+
+\subsection{Montage des partitions}
+
+Le montage des partitions consiste à rendre accessible un système de fichier
+via un répertoire.
+
+Dans cet exemple, seule la racine sera montée. Créez un répertoire
+\emph{<<target>>} à la racine de votre live CD est montez la racine sous ce
+répertoire.
+
+Pour rappel, les périphériques de la machines sont accessibles dans le
+répertoire \emph{<</dev>>}. Le premier disque dur est nommé \emph{<<sda>>}. La
+première partition primaire porte le numéro \emph{<<1>>}. Les montages sont
+fait via la commande \emph{<<mount>>}.
+
+\subsection{Écriture du système de base}
+
+L'utilitaire \emph{<<debootstrap>>} permet d'installer au travers du réseau le
+système de base.
+
+Regardez la syntaxe de cette commande et utilisez-la pour déployer la base de
+votre système en utilisant une variante <<minbase>>.
+
+\emph{NB : Utilisez << http://ftp.fr.debian.org/debian >> comme mirroir}
+
+\subsection{Entrée dans le futur environnement}
+
+Cette étape permet d'utiliser le nouveau système fraîchement installé pour y
+installer les éléments nécessaires à son fonctionnement.
+
+Le système installé utilisera donc le noyau du live cd déjà chargé.
+
+Pour accéder à toutes les fonctionnalités du système, un certain nombre d'accès
+doivent y être ajoutés :
+
+\begin{itemize}
+ \item montez /dev pour pouvoir accéder aux périphériques
+ \item montez /proc pour pouvoir agir sur les processus et interagir avec le
+noyau.
+\end{itemize}
+
+\begin{verbatim}
+ # mount -t proc none /target/proc
+ # mount -o bind /dev /target/dev
+ # mount -t sysfs none /target/sys
+\end{verbatim}
+
+La commande \emph{<<chroot>>} permettra d'exploiter votre futur environnement.
+Regardez sa syntaxe et utilisez-la pour exécuter \emph{<</bin/bash>>} dans
+votre futur environnement.
+
+\subsection{Mise à jour du système}
+
+Sous Debian les logiciels sont gérés par la commande \emph{<<apt-get>>}. Par
+exemple la commande :
+
+\begin{verbatim}
+ # apt-get update
+\end{verbatim}
+
+met à jour la liste des paquets (programmes) disponibles.
+
+\begin{verbatim}
+ # apt-get upgrade
+\end{verbatim}
+
+met à jour les paquets dont une nouvelle version a été trouvée dans la liste
+des paquets disponibles.
+
+Pour rechercher un paquet, \emph{<<apt-cache>>} sera utilisé :
+
+\begin{verbatim}
+ # apt-cache search motclé
+\end{verbatim}
+
+Dans notre cas, aucun paquet n'est à mettre à jour. Pourquoi ?
+
+\subsection{Installation d'un noyau}
+
+Votre futur système à besoin d'un noyau pour fonctionner. Documentez et
+utilisez <<apt-get>> pour installer le noyau nommé \emph{<<linux-image-amd64>>}
+(il s'agit également du nom du paquet).
+
+\subsection{Installation du chargeur de démarrage Grub}
+
+De la même manière que pour le noyau, installez grub2 sur votre système.
+Installez-le dans le MBR.
+
+\subsection{Finalisation du futur environnement}
+
+\subsubsection{Initialisation du mot de passe root}
+
+Choisir un mot de passe administrateur et initialisez le avec la commande
+\emph{<<passwd>>}.
+
+\subsubsection{Renseignement des points de montages}
+
+Les systèmes de fichiers à monter au démarrage de votre futur système sont
+notés dans \emph{<</etc/fstab>>}.
+
+L'exemple suivant correspond à un fichier \emph{fstab} :
+
+\begin{verbatim}
+<file system> <dir> <type> <options> <dump> <pass>
+/dev/sda1 /		ext2 defaults 0 0
+/dev/sda2 none	swap defaults 0 0
+\end{verbatim}
+
+Adaptez cette configuration et inscrivez-la dans votre fichier fstab.
+
+\begin{solution}
+Aborder le point des UUID
+\end{solution}
+
+\subsubsection{Installation de paquets additionnels}
+
+Pour se connecter au réseau, votre futur système nécessitera un client DHCP.
+Cherchez un client DHCP dans la liste des paquets disponible et installez-le.
+
+Installez le package <<systemd>> et creez un lien symbolique <</sbin/init>> pointant vers <</bin/systemd>>.
+
+\subsection{Redémarrage}
+
+Quittez l'environnement \emph{<<chrooté>>} et redémarrez votre système.
+
+\section{Test et évolution de votre VM}
+
+Connectez-vous sur votre machine virtuelle. Quels sont les premiers constats ?
+
+Que retourne la commande \emph{<<date>>}?
+
+Corrigez cette machine pour une utilisation plus simple.
+
+
+
+\end{document}

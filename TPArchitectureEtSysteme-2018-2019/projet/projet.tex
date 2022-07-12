@@ -1,0 +1,461 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tabularx,lipsum}
+\usepackage{minted}
+\usepackage{hyperref}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\newcounter{questionc}
+\newcommand{\question}{\stepcounter{questionc}\subsection{Question \thequestionc}}
+% NE PAS CHANGER !!
+\ifx \public \undefined \def\public{etudiants} \fi
+\usepackage[\public]{tps}
+\projettrue
+
+% Titre du projet
+\newcommand{\titreprojet}{Devoir maison}
+
+\graphicspath{{imgs/}}
+
+\begin{document}
+
+\entete{\titreprojet}
+
+\begin{introduction}
+  Ce DM se décompose en deux parties:
+  \begin{itemize}
+  \item Une partie programmation qui va vous demander de recoder un \textit{shell} en C
+  \item Une partie contenant des questions théoriques/pratiques liées au cours
+  \end{itemize}
+
+  Les modalités de rendus seront précisées à la fin du sujet
+\end{introduction}
+
+\section{Recoder un Shell}
+
+Télecharger le bootstrap à l'adresse suivante : \url{www.lsv.fr/~fthire/teaching/2018-2019/archisys/projet/shell-bootstrap.tar.gz}. Vous trouverez le squelette de base du code C que l'on va utiliser pour recoder un shell. Pour compiler le projet, je vous invite à utiliser la commande \mintinline{bash}{make}. Par défault, le shell ne peut pas faire grand chose. On va essayer de le compléter pas à pas. On va d'abord s'intéresser à la fonction \mintinline{C}{execute}:
+
+\question
+
+Le cas de base, correspond au cas \mintinline{C}{C_PLAIN}. Donner un exemple de commande qui une fois parsée retourne un objet \mintinline{C}{cmd} tel que \mintinline{C}{cmd->type == C_PLAIN}. En utilisant \mintinline{C}{ps}, observer ce qui se passe dans un terminal lorsque vous lancez une commande.
+
+Pour le moment, toute commande de base sera tout simplement exécutée. Pour exécuter une commande, la librairie \texttt{glibc} offre un panel de fonctions dont on peut avoir un aperçu en utilisant la commande
+
+\begin{minted}{bash}
+  man exec
+\end{minted}
+
+Selon vous, quelle fonction serait la plus appropriée dans notre cas (justifier) ? En utilisant toutes ces observations, remplir le trou \mintinline{C}{C_PLAIN}.
+
+\question
+
+Quel est le symbol pour l'opérateur de séquence en bash ? Donner un exemple de commande où la séquence se comporte différent vis-à-vis de l'opérateur \textit{et} logique.
+
+Implémenter le cas \mintinline{C}{C_SEQ}.
+
+\question
+
+Implémenter les cas \mintinline{C}{C_AND} et \mintinline{C}{C_OR}.
+
+\question
+
+Il est possible en bash d'écrire une commande de la forme
+
+\begin{mintinline}{bash}
+  (cmd1 \&\& cmd2 | cmd3 ...) 2>/dev/null
+\end{mintinline}
+
+Quel est le rôle des parenthèses dans la commande ci-dessus ? Donner un exemple d'une commande qui utilise (de façon non triviale) ces parenthèses.
+
+Implémenter le cas \mintinline{C}{C_VOID}.
+
+\question
+
+Que se passe-t-il si vous faites \texttt{CTRL+C} dans notre shell ? Proposer une solution pour récupérer la main après que l'utilisateur a entré \texttt{CTRL+C}.
+
+\question
+
+Que se passe-t-il lorsque que vous lancez la commande
+\begin{minted}{C}
+  ls > dump
+\end{minted}
+Pour corriger ce problème, je vous invite à lire les pages de manuel \mintinline{bash}{man stdin} et \mintinline{bash}{man dup}. En utilisant toutes ces informations, implémenter la fonction \mintinline{C}{apply_redirections} puis modifier votre implémentation pour que la commande ci-dessus se comporte comme prévu.
+
+\question
+
+Il nous reste finalement à implémenter le cas \mintinline{C}{C_PIPE}, pour cela je vous invite à regarder le manuel de \mintinline{bash}{man pipe}. Donner un exemple qui met en évidence pourquoi on ne peut pas simplement utiliser \mintinline{bash}{dup2} pour réimplémenter le pipe ? En utilisant la fonction \mintinline{bash}{pipe}, réimplémenter le cas \mintinline{C}{C_PIPE}.
+
+
+\question
+
+À ce stade, nous avons implémenté un \textit{shell} très rudimentaire, cependant il est possible de l'étendre de bien des manières. Voici quelques possibilités d'extensions qui peuvent vous rapporter des points bonus :
+
+\begin{itemize}
+\item Réimplémenter les commandes \mintinline{bash}{ls}, \mintinline{bash}{cat} ou \mintinline{bash}{cd}
+\item Implémenter l'extension des wildcards : \mintinline{bash}{ls *.pdf}
+\item Implémenter les processus de fond via les commandes : \mintinline{bash}{jobs}, \mintinline{bash}{bg}, \mintinline{bash}{fg}, ...
+\end{itemize}
+
+\section{Questions diverses}
+
+\question
+
+Le programme ci-dessous est inefficace, pourquoi ?
+\begin{minted}{C}
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+int main(int argc, char **argv)
+{
+  int fd1, fd2, rc;
+  char buf;
+  if(argc != 3) {
+    fprintf(stderr, "Syntaxe: %s f1 f2\n", argv[0]);
+    exit(1);
+  }
+
+  fd1 = open(argv[1], O_RDONLY);
+  if(fd1 < 0) {
+    perror("open(fd1)");
+    exit(1);
+  }
+
+  fd2 = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  if(fd2 < 0) {
+    perror("open(fd2)");
+    exit(1);
+  }
+  while(1) {
+    rc = read(fd1, &buf, 1);
+    if(rc < 0) {
+      perror("read");
+      exit(1);
+    }
+    if(rc == 0)
+    break;
+    rc = write(fd2, &buf, 1);
+    if(rc < 0) {
+      perror("write");
+      exit(1);
+    }
+    if(rc != 1) {
+      fprintf(stderr, "Ecriture interrompue");
+      exit(1);
+    }
+  }
+  close(fd1);
+  close(fd2);
+  return 0;
+}
+\end{minted}
+
+Expliquez pourquoi. En particulier, décrivez les endroits critiques du programme. Quelle(s) correction(s) pouvez-vous proposer pour corriger le programme ci-dessus ?
+
+\begin{solution}
+  Au lieu de copier les bits un à un, on peut utiliser un buffer. Ici, il est possible de développer notamment sur la taille du buffer : s'il est trop gros cela va poser d'autres problèmes etc...
+\end{solution}
+
+\question
+
+Le principe du programme ci-dessous est le suivant : on génère des nombres aléatoires entre \(0\) et \(512\) et on fait la somme de ceux qui sont plus grand que \(256\) une certain nombre de fois (\(10000\) fois présentement). On remarque cependant que si on trie le tableau, ce calcul est plus rapide en moyenne (en tout cas sur ma machine). Donner une explication à ce phénomène ainsi que les différents mécanismes qui rentrent en jeu.
+
+\begin{minted}{C}
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#define SIZE 100000
+
+int comp (const void * elem1, const void * elem2)
+{
+    int f = *((int*)elem1);
+    int s = *((int*)elem2);
+    if (f > s) return  1;
+    if (f < s) return -1;
+    return 0;
+}
+
+int main(int argc, char* argv[]) {
+  int data[SIZE];
+  int data2[SIZE];
+
+  srand(time(NULL));
+  for (unsigned int c = 0 ; c < SIZE ; c++) {
+    data[c]=rand()%512;
+    data2[c]=rand()%512;
+  }
+
+  qsort (data2, sizeof(data2)/sizeof(*data2), sizeof(*data2), comp);
+
+  int sum = 0;
+  clock_t start_1, end_1;
+  start_1=clock();
+  for(unsigned int i = 0 ; i < 10000 ; i++) {
+    for (unsigned int c = 0 ; c < SIZE ; c++) {
+      if(data[c] < 256) {
+	sum += data[c];
+      }
+    }
+  }
+  end_1=clock();
+
+  sum=0;
+  clock_t start_2, end_2;
+  start_2=clock();
+  for(unsigned int i = 0 ; i < 10000 ; i++) {
+    for (unsigned int c = 0 ; c < SIZE ; c++) {
+      if(data2[c] < 256) {
+	sum += data2[c];
+      }
+    }
+  }
+  end_2=clock();
+
+  printf("not sorted: %f\n", (double) (end_1-start_1)/CLOCKS_PER_SEC);
+  printf("sorted: %f\n", (double) (end_2-start_2)/CLOCKS_PER_SEC);
+
+  return 0;
+}
+
+\end{minted}
+
+\begin{solution}
+  Le programme met en évidence le phénomène de \textit{branch prediction}. Ce phénomène dépend de l'architecture utilisée.
+\end{solution}
+
+\question
+
+\begin{minted}{C}
+#include<stdlib.h>
+#include<stdio.h>
+
+int main(int argc, char* argv[]) {
+  float step1 = 1/2.;
+  float step2 = 1/10.;
+  float sum1, sum2 = 0;
+  printf("step1: %f\n", step1);
+  printf("step2: %f\n", step2);
+  for(int i = 0 ; i < 50 ; i++) {
+    sum1 += step1;
+    sum2 += step2;
+  }
+  printf("sum1: %f\n", sum1);
+  printf("sum2: %f\n", sum2);
+
+  return 0;
+}
+\end{minted}
+
+Le programme ci-dessus produit l'affichage suivant.
+
+\begin{minted}{bash}
+step1: 0.500000
+step2: 0.100000
+sum1: 25.000000
+sum2: 4.999998
+\end{minted}
+
+\begin{itemize}
+\item Expliquer l'affichage.
+\item Que se passe-t-il si on remplace les \mintinline{C}{float} par des \mintinline{C}{double} ?
+\end{itemize}
+
+\begin{solution}
+  \begin{itemize}
+  \item 0.5 admet une représentation exacte et donc ne génère pas d'erreur liée à l'arrondi
+  \item 0.1 n'admet pas une représentation exacte (on peut utiliser le format \mintinline{C}{%0.10f} pour mettre ça en évidence). Il y a donc une erreur qui s'accumule.
+    \item Remplacer des \mintinline{C}{float} par un \mintinline{C}{double} ne fait que repousser le problème.
+  \end{itemize}
+\end{solution}
+
+\question
+
+Expliquer le comportement du programme suivant :
+\begin{minted}{C}
+#include<stdlib.h>
+#include<stdio.h>
+#include<float.h>
+int main(int argc, char* argv[]) {
+  double y = FLT_MAX;
+  if (y == y+1.) {
+    printf("true\n");
+  }
+  else {
+    printf("false\n");
+  }
+
+  return 0;
+}
+\end{minted}
+
+\begin{solution}
+  Avec un exposant grand, ajouter \(1\) est trop peu significatif si bien que cela se fait absorber par l'arrondi.
+\end{solution}
+
+\question
+
+Sur le programme suivant :
+\begin{minted}{C}
+#include<stdlib.h>
+#include<stdio.h>
+#include <time.h>
+
+#define SIZE 10000
+
+int main(int argc, char *argv[]) {
+
+  int **array = (int **) malloc(SIZE * sizeof(int *));
+
+  for (unsigned int i=0; i < SIZE; i++)
+    array[i] = (int *) malloc(SIZE * sizeof(int));
+  int sum;
+  srand(time(NULL));
+
+  for (unsigned int x = 0 ; x < SIZE ; x++) {
+    for (unsigned int y = 0 ; y < SIZE ; y++) {
+      array[x][y]=rand()%2;
+    }
+  }
+
+  sum = 0;
+  clock_t temps1;
+  for (unsigned int x = 0 ; x < SIZE ; x++) {
+    for (unsigned int y = 0 ; y < SIZE ; y++) {
+      sum+=array[x][y];
+    }
+  }
+
+  temps1=clock();
+
+  sum = 0;
+  clock_t temps2;
+  for (unsigned int y = 0 ; y < SIZE ; y++) {
+    for (unsigned int x = 0 ; x < SIZE ; x++) {
+      sum+=array[x][y];
+    }
+  }
+
+  temps2=clock();
+  printf("temps1: %f\n", (double) temps1/CLOCKS_PER_SEC);
+  printf("temps2: %f\n", (double) temps2/CLOCKS_PER_SEC);
+}
+\end{minted}
+
+\begin{itemize}
+\item Expliquer pourquoi on utilise un malloc au lieu de \mintinline{C}{int array[SIZE][SIZE]} ?
+\item Expliquer pourquoi on observe un temps d'exécution plus long la deuxième fois ?
+\end{itemize}
+
+\begin{solution}
+  \begin{itemize}
+  \item La pile est trop petite.
+  \item Les données sont contigües en mémoire le long des lignes. Le deuxième passage génère plus de \textit{cache default} que le premier.
+  \end{itemize}
+\end{solution}
+
+\question
+
+Le programme suivant n'a pas le comportement attendu :
+\begin{minted}{C}
+#include<unistd.h>
+#include<stdio.h>
+
+int main (int argc, char *argv[]) {
+  int p[2];
+  pipe(p);
+  close(p[0]);
+
+  if (fork()) {
+    while (1) {
+      sleep(1);
+      write(p[1],"a",1);
+    }
+   } else {
+     char c = 'a';
+     while (1) {
+       read(p[0],&c,1);
+       write(1,&c,1);
+     }
+   }
+   return 0;
+}
+\end{minted}
+
+\begin{itemize}
+\item Expliquer pourquoi le programme se comporte ainsi.
+\item Que se passe-t-il si vous le lancez en background (avec \mintinline{bash}{&}) ? Pourquoi ?
+\end{itemize}
+
+\question
+
+\begin{enumerate}
+\item Écrire un programme qui affiche :
+  \begin{itemize}
+  \item L'adresse courante de la pile
+  \item L'adresse courante du tas
+  \item L'adresse de la fonction \mintinline{C}{main}
+  \end{itemize}
+\item En déduire la taille maximale qu'un tableau peut allouer sur la pile
+\item À votre avis, pourquoi l'adresse de la fonction \mintinline{C}{main} n'est pas égale à \mintinline{C}{0x0} ?
+\item Écrire un programme qui ne fait rien et retourne simplement la valeur \(42\). Compiler, et observer la taille de l'exécutable. Selon vous, est-ce cohérent avec l'assembleur généré\footnote{utiliser l'option \mintinline{bash}{-S} pour générer un fichier assembleur} ? Qu'est-ce qui peut expliquer ce phénomène ?
+\end{enumerate}
+
+Pour ces deux dernières questions, on attend seulement une réponse de quelques lignes.
+\begin{solution}
+  \begin{enumerate}
+  \item
+    \begin{minted}{C}
+#include<stdio.h>
+#include<stdlib.h>
+#include<stdint.h>
+
+int main(int argc, char *argv[]) {
+  void *sp = NULL;
+  int *hp = malloc(0);
+  int *hp2 = malloc(4);
+  printf("%p\n", (void *)&sp);
+  printf("%p\n", (int *) hp);
+  printf("%p\n", (int *) hp2);
+  printf("%ld\n", (long int) (((intptr_t) &sp - (intptr_t) hp)/8));
+  printf("%p\n", &main);
+  return 0;
+}
+\end{minted}
+\item Voir ci-dessus
+\item Dans les détails, la réponse est très compliquées, mais on peut au moins dire qu'au linking, d'autres fonctions sont ajoutées comme le code de \mintinline{C}{printf}.
+\item Sans renrer dans les détails, on peut donner plusieurs éléments de réponse :
+  \begin{itemize}
+  \item Intéraction avec le système pour charger les arguments sur la ligne de commande
+  \item Le format ELF
+  \item table des symboles
+  \item etc...
+  \end{itemize}
+\end{enumerate}
+
+\end{solution}
+
+\section{Modalités de rendu}
+
+Votre rendu devra se présenter sous une archive de la forme \texttt{NOM\_PRENOM.tar.gz} (crée via la commande \mintinline{bash}{tar czf}) qui se dézippera en un dossier \texttt{NOM\_PRENOM}. Ce dossier contiendra un fichier \texttt{readme.pdf} (au format pdf donc) ainsi qu'un dossier \texttt{shell} qui contiendra votre code. \textbf{Attention : tout programme qui ne compile pas ne sera pas évalué}. Votre fichier \texttt{readme.pdf} devra contenir les informations suivantes :
+
+\begin{itemize}
+\item Les réponses à certaines questions concernant l'implémentation du \texttt{shell}
+\item Des exemples de commandes qui mettent en évidence le fonctionnement de votre implémentation
+\item Une description des extensions optionnelles implémentées
+\item Les réponses aux questions de la seconde partie
+\end{itemize}
+
+La qualité des réponses sera prise en compte dans la notation.
+
+Quelques conseils:
+\begin{itemize}
+\item Il vous est conseillé d'écrire le \texttt{readme.pdf} avec \texttt{LaTeX}. Pour inclure du code, vous pouvez utiliser le package \mintinline{bash}{minted} (utilisé pour ce document mais que vous devrez installer à la main avec le paquet python \mintinline{bash}{pygmentize}) ou bien le paquet \mintinline{bash}{lstlistings}.
+\item Dans vos réponses, demandez-vous si chaque phrase est nécessaire. Si une phrase n'est pas nécessaire, alors c'est qu'elle est inutile et vous pouvez l'enlever. Éviter aussi des réponses trop vagues ou bien trop génériques, soyez précis !
+\end{itemize}
+\end{document}

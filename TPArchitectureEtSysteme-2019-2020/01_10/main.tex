@@ -1,0 +1,60 @@
+\documentclass{exam}
+\usepackage{../main}
+
+\if\answers0\noprintanswers\fi
+\if\answers1\printanswers\fi
+
+\title{DM et babouins}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\section{Babouins et gu\'epards}
+Mod\'elisons un syst\`eme proies-pr\'edateurs par des processus.  Un gu\'epard
+attaque un babouin via l'envoi d'un signal. La reproduction se fait par un
+fork.
+
+On note \( B \) le nombre de babouins et \( G \) le nombre de gu\'epards.
+Un gu\'epard attaque un babouin avec une probabilit\'e \( a \). Un
+babouin se reproduit avec une probabilit\'e \( r_b \) et un gu\'epard
+avec une probabilit\'e \( r_g \).
+
+Lorsqu'un gu\'epard lance une attaque, il choisit une cible. Pour cela, on
+allouera un espace m\'emoire partag\'e via \texttt{shmem} contenant un tableau
+avec tous les \textit{pids} des babouins. Pour se reproduire un individue d'une
+esp\`ece \'emet une invitation avec une proababilit\'e \( r_b\) \`a un autre
+individu, qui accepte avec une probabilit\'e \( r_b \).
+
+Chaque individu attend un temps \( \tau \) entre chaque action.
+\begin{questions}
+  \question\
+  Quel signal utiliser pour tuer les babouins? Quel est le masque des
+  signaux \`a traiter?
+  \question\
+  Comment pourrions nous d\'ecider quel babouin tuer, en supposant que
+  l'on n'utilise pas de m\'emoire partag\'ee?
+  \question\
+  Impl\'ementer et trouver des valeurs de probabilit\'es menant \`a un
+  \'equilibre. Ne pas oublier l'existence de \texttt{getpid}.
+  \question\
+  Les deux \'esp\`eces subissant une \'evolution comportementale, les
+  individus demandent l'avis de leur partenaire avant de se reproduire.
+  Si le partenaire est d'accord (avec la m\^eme probabilit\'e), alors la
+  reproduction se fait. Peut-on encore utiliser \texttt{sa\_sigaction}?
+  (pour simplifier, un individu continue de vivre normalement tant que le
+  partenaire n'a pas accept\'e)
+  \question\
+  Si un babouin perd un de ses enfants, il peut tuer un
+  gu\'epard avec une probabilit\'e \( e \). Quel signal utiliser? Quels
+  masques faut-il changer? Impl\'ementer.
+  \question\
+  Les babouins se nourissent de la flore environnante. S'ils sont trop
+  nombreux, le manque de ressources devient dangereux. Comment
+  impl\'ementer ce m\'ecanisme?
+  \begin{solution}
+    \inputminted{C}{baboons/main.c}
+  \end{solution}
+\end{questions}
+
+\end{document}
